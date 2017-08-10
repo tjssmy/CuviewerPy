@@ -24,7 +24,7 @@ python3 CuViewerPy.py
 
 ## Functionality
 
-###Geometry implemented:
+### Geometry implemented:
 
 	1) Lines
 	2) Triangles
