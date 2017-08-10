@@ -1,7 +1,7 @@
 # CuviewerPy
 Python implementation of CuViewer using VTK 
 
-## Description
+## Description:
 
 A Python 3.0 implementation of CuViewer using VTK. The original CuViewer was QT and opengl based 3D viewer (http://cuviewer.sourceforge.net/). It reads formatted binary files and displays basic geometric entities such as lines, triangles, quadrilaterals, spheres and ellipsoids. The original viewer has quite a lot of functionality, such as grouping entities in scenes, contour plotting, standard views, etc. 
 
@@ -18,11 +18,11 @@ Basic implementation:
 4) Contouring is enabled
 6) Standard views - perspective and orthogonal views
 
-## Use
+## Use:
 
 python3 CuViewerPy.py
 
-## Functionality
+## Functionality:
 
 ### Geometry implemented:
 
@@ -34,7 +34,7 @@ python3 CuViewerPy.py
 
 Key board commands:
 
-	s: Toggle screen visibility. Command sequence: s <scene number> s
+	s: Toggle scene visibility. Command sequence: s <scene number> s
 	
 	a: Draw all scenes
 	
@@ -62,7 +62,7 @@ Key board commands:
 	
 	i: Print scene info.	
 	
-###	Extensions from QT version
+###	Extensions from QT version:
 
 1) Added ability to define a scene label.
 
@@ -74,7 +74,7 @@ Key board commands:
 2) Can we use it as an interactive debugging visualizer. Fork/Wait/Pipes?
 3) Add VTK functionality?
 
-## Installation
+## Installation:
 
 1) Install python3 
 1) Install VTK with python bindings
