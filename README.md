@@ -19,9 +19,18 @@ Basic implementation:
 6) Standard views - perspective and orthogonal views
 
 ## Use
+
 python3 CuViewerPy.py
 
 ## Functionality
+
+###Geometry implemented:
+
+	1) Lines
+	2) Triangles
+	3) Quadrilaterals
+	
+### Window interactions:
 
 Key board commands:
 
@@ -53,10 +62,16 @@ Key board commands:
 	
 	i: Print scene info.	
 	
+###	Extensions from QT version
+
+1) Added ability to define a scene label.
+
 ## ToDo:
 
+1) Geometry: Points, spheres and ellipses
 1) Wrap a interface around it. Not sure which to useTkInter? PyQt? Pywx?
 2) Can we use it as an interactive debugging visualizer. Fork/Wait/Pipes?
+3) Add VTK functionality?
 
 ## Installation
 
