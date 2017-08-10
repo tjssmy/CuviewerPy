@@ -68,7 +68,8 @@ Key board commands:
 
 ## ToDo:
 
-1) Geometry: Points, spheres and ellipses
+1) Better/choice of colormaps for contouring.
+1) Geometry: Points, spheres and ellipses.
 1) Wrap a interface around it. Not sure which to useTkInter? PyQt? Pywx?
 2) Can we use it as an interactive debugging visualizer. Fork/Wait/Pipes?
 3) Add VTK functionality?
