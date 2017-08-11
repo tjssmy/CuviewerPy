@@ -60,7 +60,9 @@ Key board commands:
 	
 	c: Create contours
 	
-	i: Print scene info.	
+	i: Print scene info.
+
+    R: Reread and render file
 	
 ###	Extensions from QT version:
 

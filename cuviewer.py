@@ -584,6 +584,8 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
                 self.ScenePress = False
         elif sym in "Tt":
             self.ScenePress = True
+        elif sym in "R":
+            vtkCuv.ReReadFile()
         elif sym in "Aa":
             vtkCuv.SceneVis(True)
             vtkCuv.ReDraw()
@@ -621,10 +623,14 @@ class cuvFileData(object):
     def __init__(self,file):
         self.pos = 0
 
-        fid = open(file, 'rb')
-        self.data = fid.read()
-        fid.close()
+        try:
+            fid = open(file, 'rb')
 
+            self.data = fid.read()
+            fid.close()
+        except IOError:
+            print("Could not read file: {}".format(file))
+            exit()
 
 class CreateVtkCuv(object):
 
@@ -638,14 +644,17 @@ class CreateVtkCuv(object):
         self.EdgeDraw = False
         self.ContDraw = False
 
-    def ReadCuvFile(self, file):
+    def ReadCuvFile(self, file=None):
 
         print('Reading file ... ')
 
-        self.fdata = cuvFileData(file)
+        if file is not None:
+            self.file = file
 
+        self.fdata = cuvFileData(self.file)
 
-        self.fid = open(file, 'rb')
+        # self.fid = open(self.file, 'rb')
+        self.fid = 0
 
         if not self.ReadInitGLFile():
             self.err = 1
@@ -711,7 +720,7 @@ class CreateVtkCuv(object):
             return False
 
         nScene = 1
-
+        self.scenes = []
         while tag == BEGIN_SCENE:
 
             scene = Scene()
@@ -734,6 +743,12 @@ class CreateVtkCuv(object):
             self.renderer.AddActor(s.surfActor)
             self.renderer.AddActor(s.edgeActor)
             self.renderer.AddActor(s.contActor)
+
+    def RemoveActors(self):
+        for s in self.scenes:
+            self.renderer.RemoveActor(s.surfActor)
+            self.renderer.RemoveActor(s.edgeActor)
+            self.renderer.RemoveActor(s.contActor)
 
     def SetRenderWin(self):
 
@@ -801,6 +816,14 @@ class CreateVtkCuv(object):
 
         self.ReDraw()
 
+
+    def ReReadFile(self):
+        
+        self.RemoveActors()
+        self.ReadCuvFile()
+        self.CreateSceneMappersAndActors()
+        self.AddActors()
+        self.ReDraw()
 
     def ReDraw(self):
 
@@ -886,6 +909,7 @@ class CreateVtkCuv(object):
         print('\tc: Create contours')
         print('\ti: Print scene info.')
         print('\th: This message')
+        print('\tR: Reread and render file')
 
 
 def WriteGLTag(fid, tag):
