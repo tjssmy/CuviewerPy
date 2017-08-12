@@ -606,7 +606,6 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
                 vtkCuv.EdgeDraw = True
             vtkCuv.ReDraw()
         elif sym in "Cc":
-            print('{}'.format(sym))
             if vtkCuv.ContDraw:
                 vtkCuv.ContDraw = False
             else:
