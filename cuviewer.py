@@ -162,19 +162,18 @@ def ReadFloats(fid, fdata, t, n, bytesMirrored):
 def ReadColorAndTrans(fid, fdata,fill, out, multi, trans, n, bytesMirrored):
     
     color = [np.array([0.5, 0.5, 0.5])]
-    tr = 0.0
+    tr = [0.0]
 
     if fill or out:
         color[0] = np.multiply(ReadFloats(fid, fdata, np.float32, 3, bytesMirrored), 255.0)
         if trans:
-            tr = ReadFloats(fid, fdata, np.float32, 1, bytesMirrored)
+            tr[0] = ReadFloats(fid, fdata, np.float32, 1, bytesMirrored)
 
         if multi:
             for i in range(1, n):
                 color.append(np.multiply(ReadFloats(fid, fdata, np.float32, 3, bytesMirrored), 255.0))
-
-            if trans:
-                tr = ReadFloats(fid, fdata, np.float32, 1, bytesMirrored)
+                if trans:
+                    tr.append(ReadFloats(fid, fdata, np.float32, 1, bytesMirrored))
 
     return color, tr
 
