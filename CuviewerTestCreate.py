@@ -32,8 +32,16 @@ ny = 11
 x = np.linspace(0, 1, nx)
 y = np.linspace(0, 0.1,ny)
 
+
+dx = x/nx
+dy = y/ny
+
 for j in range(0, ny-1):
     for i in range(0, nx-1):
+
+        # vec = [dx, dy, dx + dx*(i*dx/nx)]
+        vec = [0.05, 0.1, 0.1 + i*.01]
+
         p1 = [x[i], y[j], 0]
         p2 = [x[i], y[j+1], 0]
         p3 = [x[i+1], y[j+1], 0]
@@ -45,6 +53,7 @@ for j in range(0, ny-1):
         color4 = [x[i+1],0,1-x[i+1]]
 
         cuviewer.Write_GL_quad(fid, p1, p2, p3, p4, color1, color2, color3, color4, 0.0, 1, 1)
+        cuviewer.Write_GL_vector(fid,p1,vec)
 
 cuviewer.WriteSceneEnd(fid)
 
@@ -54,6 +63,8 @@ ny = 11
 
 x = np.linspace(0, 1, nx)
 y = np.linspace(0, 0.1, ny)
+
+
 
 for j in range(0, ny - 1):
     for i in range(0, nx - 1):
@@ -66,6 +77,7 @@ for j in range(0, ny - 1):
         color3 = [x[i+1],0,1-x[i+1]]
 
         cuviewer.Write_GL_tri(fid, p1, p2, p3, color1, color2, color3, 0.0, 1, 1)
+
 
 cuviewer.WriteSceneEnd(fid)
 

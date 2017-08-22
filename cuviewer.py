@@ -2,7 +2,7 @@ import numpy as np
 import vtk
 import math
 import sys
-import struct
+# import struct
 
 def tic():
     #Homemade version of matlab tic and toc functions
@@ -58,6 +58,7 @@ SQUADRI = bytes.fromhex('03')
 SSPHERE = bytes.fromhex('04')
 SSPHOID = bytes.fromhex('05')
 STEXT = bytes.fromhex('06')
+SVECTOR = bytes.fromhex('07')
 
 # shape properties in the scene section
 SFILL = bytes.fromhex('01')
@@ -341,6 +342,7 @@ class Scene(object):
         self.label = 'N/A'
 
         self.points = vtk.vtkPoints()
+        self.vecPoints = vtk.vtkPoints()
 
         self.temps = vtk.vtkFloatArray()
         self.temps.SetNumberOfComponents(1)
@@ -352,15 +354,35 @@ class Scene(object):
 
         self.lines = vtk.vtkCellArray()
         self.polys = vtk.vtkCellArray()
+
+        self.vectors = vtk.vtkDoubleArray()
+        self.vectors.SetNumberOfComponents(3)
+        self.vectors.SetName('vectors')
+
+        self.vectorMags = vtk.vtkDoubleArray()
+        self.vectorMags.SetNumberOfComponents(1)
+        self.vectorMags.SetName('vecMag')
+
         self.spheres = []
         self.spheroids = []
+
         self.texts = []
 
         self.vtkSurfPolyData = vtk.vtkPolyData()
         self.vtkContPolyData = vtk.vtkPolyData()
         self.vtkEdgePolyData = vtk.vtkPolyData()
+        self.vtkVectPolyData = vtk.vtkPolyData()
 
         self.visible = True
+
+    def AddVtkVector(self, fid, fdata, bytesMirrored):
+        pos = ReadFloats(fid, fdata, np.float32, 3, bytesMirrored)
+        vec = ReadFloats(fid, fdata, np.float32, 3, bytesMirrored)
+        vecMag = [math.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])]
+
+        self.vecPoints.InsertNextPoint(pos)
+        self.vectors.InsertNextTuple(vec)
+        self.vectorMags.InsertNextTuple(vecMag)
 
     def GetVtkPoly(self, fid, fdata, n, bytesMirrored, type):
 
@@ -449,14 +471,19 @@ class Scene(object):
                 elif tag == STEXT:
                     # self.texts.append(ReadText(fid, fdata,bytesMirrored,'T'))
                     pass
+                elif tag == SVECTOR:
+                    self.AddVtkVector(fid, fdata, bytesMirrored)
 
                 tag = ReadTag(fid, fdata)
 
             self.vtkSurfPolyData.SetPoints(self.points)
             self.vtkSurfPolyData.SetLines(self.lines)
             self.vtkSurfPolyData.SetPolys(self.polys)
-
             self.vtkSurfPolyData.GetPointData().SetScalars(self.colors)
+
+            self.vtkVectPolyData.SetPoints(self.vecPoints)
+            self.vtkVectPolyData.GetPointData().SetVectors(self.vectors)
+            self.vtkVectPolyData.GetPointData().SetScalars(self.vectorMags)
 
             self.vtkEdgePolyData.SetPoints(self.points)
             self.vtkEdgePolyData.SetPolys(self.polys)
@@ -532,6 +559,34 @@ class Scene(object):
 
         self.edgeActor.VisibilityOff()
 
+        # Source for the glyph filter
+        arrow = vtk.vtkArrowSource()
+        arrow.SetTipResolution(16)
+        arrow.SetTipLength(0.3)
+        arrow.SetTipRadius(0.1)
+
+        glyph = vtk.vtkGlyph3D()
+        glyph.SetSourceConnection(arrow.GetOutputPort())
+        glyph.AddInputData(self.vtkVectPolyData)
+        glyph.SetVectorModeToUseVector()
+        glyph.SetScaleFactor(.1)
+        glyph.SetColorModeToColorByScalar()
+        glyph.SetScaleModeToScaleByVector()
+        glyph.OrientOn()
+        glyph.Update()
+
+        self.glyphMapper = vtk.vtkPolyDataMapper()
+        self.glyphMapper.SetInputConnection(glyph.GetOutputPort())
+        self.glyphMapper.SetScalarModeToUsePointFieldData()
+        self.glyphMapper.SetColorModeToMapScalars()
+        self.glyphMapper.ScalarVisibilityOn()
+        self.glyphMapper.SelectColorArray('vecMag')
+        # Colour by scalars.
+        # scalarRange = polydata.GetScalerRange()
+        # glyphMapper.SetScalarRange(scalarRange)
+
+        self.glyphActor = vtk.vtkActor()
+        self.glyphActor.SetMapper(self.glyphMapper)
 
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
 
@@ -569,7 +624,7 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
         sym = vtkCuv.renderWindowInteractor.GetKeySym()
 
         if self.ScenePress:
-            if sym in "Tt":
+            if sym in "t":
                 self.ScenePress = False
                 n = int(self.SceneTxt) - 1
                 vtkCuv.SceneToggleVis(n)
@@ -581,36 +636,50 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
             else:
                 print('bad scene number')
                 self.ScenePress = False
-        elif sym in "Tt":
+        elif sym in "t":
             self.ScenePress = True
         elif sym in "R":
             vtkCuv.ReReadFile()
-        elif sym in "Aa":
+        elif sym in "a":
             vtkCuv.SceneVis(True)
             vtkCuv.ReDraw()
-        elif sym in "Nn":
+        elif sym in "n":
             vtkCuv.SceneVis(False)
             vtkCuv.ReDraw()
-        elif sym in "Ii":
+        elif sym in "i":
             vtkCuv.PrintSceneInfo()
-        elif sym in "Pp":
+        elif sym in "p":
             vtkCuv.TogglePersp()
             vtkCuv.ReDraw()
         elif sym in "rlfbudv":
             vtkCuv.SetView(sym)
-        elif sym in "Oo":
+        elif sym in "o":
             if vtkCuv.EdgeDraw:
                 vtkCuv.EdgeDraw = False
             else:
                 vtkCuv.EdgeDraw = True
             vtkCuv.ReDraw()
-        elif sym in "Cc":
+        elif sym in "c":
             if vtkCuv.ContDraw:
                 vtkCuv.ContDraw = False
+                vtkCuv.Lighting = True
             else:
                 vtkCuv.ContDraw = True
+                vtkCuv.Lighting = False
             vtkCuv.ReDraw()
-        elif sym in "Hh":
+        elif sym in "L":
+            if vtkCuv.Lighting:
+                vtkCuv.Lighting = False
+            else:
+                vtkCuv.Lighting = True
+            vtkCuv.ReDraw()
+        elif sym in "V":
+            if vtkCuv.VectDraw:
+                vtkCuv.VectDraw = False
+            else:
+                vtkCuv.VectDraw = True
+            vtkCuv.ReDraw()
+        elif sym in "h":
             vtkCuv.ShowHelp()
 
         self.OnKeyPress()
@@ -641,6 +710,8 @@ class CreateVtkCuv(object):
         self.SurfDraw = True
         self.EdgeDraw = False
         self.ContDraw = False
+        self.VectDraw = True
+        self.Lighting = True
 
     def ReadCuvFile(self, file=None):
 
@@ -741,12 +812,14 @@ class CreateVtkCuv(object):
             self.renderer.AddActor(s.surfActor)
             self.renderer.AddActor(s.edgeActor)
             self.renderer.AddActor(s.contActor)
+            self.renderer.AddActor(s.glyphActor)
 
     def RemoveActors(self):
         for s in self.scenes:
             self.renderer.RemoveActor(s.surfActor)
             self.renderer.RemoveActor(s.edgeActor)
             self.renderer.RemoveActor(s.contActor)
+            self.renderer.RemoveActor(s.glyphActor)
 
     def SetRenderWin(self):
 
@@ -831,7 +904,9 @@ class CreateVtkCuv(object):
                 s.surfActor.VisibilityOff()
                 s.contActor.VisibilityOff()
                 s.edgeActor.VisibilityOff()
+                s.glyphActor.VisibilityOff()
             else:
+
                 if self.SurfDraw:
                     s.surfActor.VisibilityOn()
                     s.contActor.VisibilityOff()
@@ -850,6 +925,20 @@ class CreateVtkCuv(object):
                     s.edgeActor.VisibilityOn()
                 else:
                     s.edgeActor.VisibilityOff()
+
+                if self.VectDraw:
+                    s.glyphActor.VisibilityOn()
+                else:
+                    s.glyphActor.VisibilityOff()
+
+                if self.Lighting:
+                    s.surfActor.GetProperty().LightingOn()
+                    s.contActor.GetProperty().LightingOn()
+                    s.glyphActor.GetProperty().LightingOn()
+                else:
+                    s.surfActor.GetProperty().LightingOff()
+                    s.contActor.GetProperty().LightingOff()
+                    s.glyphActor.GetProperty().LightingOff()
 
         self.renderWindow.Render()
         # self.PrintSceneInfo()
@@ -882,12 +971,14 @@ class CreateVtkCuv(object):
 
         for s in self.scenes:
 
-            print ('\t Scene \'{}\' {} Vis: {} [e {} s {} c {}] Entities: Lines {} Polys {}'.format(
+            print ('\t Scene \'{}\' {} Vis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {} vecs {}'.format(
                 s.label, s.n, s.visible, s.edgeActor.GetVisibility(),
                 s.surfActor.GetVisibility(),
                 s.contActor.GetVisibility(),
+                s.glyphActor.GetVisibility(),
                 s.vtkSurfPolyData.GetNumberOfLines(),
-                s.vtkSurfPolyData.GetNumberOfPolys()))
+                s.vtkSurfPolyData.GetNumberOfPolys(),
+                s.vtkVectPolyData.GetNumberOfVerts()))
 
 
     def ShowHelp(self):
@@ -1038,4 +1129,11 @@ def Write_GL_quad(fid, p1, p2, p3, p4,  color, color2, color3, color4, trans, mu
         WriteGLColorAndTrans(fid, color2, trans)
         WriteGLColorAndTrans(fid, color3, trans)
         WriteGLColorAndTrans(fid, color4, trans)
+
+
+def Write_GL_vector(fid, p0, vec):
+
+    WriteGLTag(fid, SVECTOR)
+    WriteGLFloats(fid, p0)
+    WriteGLFloats(fid, vec)
 
