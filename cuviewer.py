@@ -569,8 +569,9 @@ class Scene(object):
         glyph.SetSourceConnection(arrow.GetOutputPort())
         glyph.AddInputData(self.vtkVectPolyData)
         glyph.SetVectorModeToUseVector()
-        glyph.SetScaleFactor(.1)
-        glyph.SetColorModeToColorByScalar()
+        glyph.SetScaleFactor(1)
+        # glyph.SetColorModeToColorByScalar()
+
         glyph.SetScaleModeToScaleByVector()
         glyph.OrientOn()
         glyph.Update()
@@ -578,14 +579,15 @@ class Scene(object):
         self.glyphMapper = vtk.vtkPolyDataMapper()
         self.glyphMapper.SetInputConnection(glyph.GetOutputPort())
         self.glyphMapper.SetScalarModeToUsePointFieldData()
-        self.glyphMapper.SetColorModeToMapScalars()
+        # self.glyphMapper.SetColorModeToMapScalars()
         self.glyphMapper.ScalarVisibilityOn()
-        self.glyphMapper.SelectColorArray('vecMag')
+        # self.glyphMapper.SelectColorArray('vecMag')
         # Colour by scalars.
         # scalarRange = polydata.GetScalerRange()
         # glyphMapper.SetScalarRange(scalarRange)
 
         self.glyphActor = vtk.vtkActor()
+        self.glyphActor.GetProperty().SetColor(0.3, 0.3, 0.0)
         self.glyphActor.SetMapper(self.glyphMapper)
 
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
