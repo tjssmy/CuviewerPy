@@ -408,7 +408,11 @@ class Scene(object):
                 t = [color[0][0]]
                 self.temps.InsertNextTypedTuple(t)
                 col = tuple(color[0])
-                self.colors.InsertNextTypedTuple(col)
+                try:
+                    self.colors.InsertNextTypedTuple(col)
+                except:
+                    pass
+
 
         if type == 'L':
             line = vtk.vtkLine()
@@ -504,6 +508,7 @@ class Scene(object):
         self.surfMapper.SetInputData(self.vtkSurfPolyData)
         self.surfActor = vtk.vtkActor()
         self.surfActor.SetMapper(self.surfMapper)
+        self.surfActor.GetProperty().SetLineWidth(2.0)
 
         self.contMapper = vtk.vtkPolyDataMapper()
         scalarRange = self.vtkContPolyData.GetScalarRange()
@@ -556,6 +561,7 @@ class Scene(object):
         self.edgeActor.SetMapper(self.edgeMapper)
         self.edgeActor.GetProperty().SetRepresentationToWireframe()
         self.edgeActor.GetProperty().SetColor([0, 0, 0])
+        self.edgeActor.GetProperty().SetLineWidth(2.0)
 
         self.edgeActor.VisibilityOff()
 
@@ -985,7 +991,7 @@ class CreateVtkCuv(object):
 
     def ShowHelp(self):
         print('\nKey board commands:')
-        print('\ts: Toggle screen visibility. Command sequence: s <scene number> s')
+        print('\tt: Toggle screen visibility. Command sequence: s <scene number> s')
         print('\ta: Draw all scenes')
         print('\tn: Don\'t draw any scenes')
         print('\tp: toggle perspective view')
@@ -999,9 +1005,10 @@ class CreateVtkCuv(object):
         print('\to: Outline polys')
         print('\tc: Create contours')
         print('\ti: Print scene info.')
-        print('\th: This message')
         print('\tR: Reread and render file')
-
+        print('\tL: Toggle lighting on/off')
+        print('\tV: Toggle vectors on/off')
+        print('\th: This message')
 
 def WriteGLTag(fid, tag):
     fid.write(tag)
