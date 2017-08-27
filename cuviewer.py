@@ -607,6 +607,7 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
 
         self.ScenePress = False
         self.SceneTxt = ''
+        self.SceneTxt1 = ''
 
     def leftButtonPressEvent(self, obj, event):
         self.mouse_motion = 0
@@ -634,17 +635,31 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
         if self.ScenePress:
             if sym in "t":
                 self.ScenePress = False
-                n = int(self.SceneTxt) - 1
-                vtkCuv.SceneToggleVis(n)
+                if self.SceneTxt1 is "":
+                    n0 = -1
+                else:
+                    n0 = int(self.SceneTxt1) - 1
+
+                if self.SceneTxt is "":
+                    n1 = -1
+                else:
+                    n1 = int(self.SceneTxt) - 1
+
+                vtkCuv.SceneToggleVis(n0, n1)
                 self.SceneTxt = ''
                 vtkCuv.ReDraw()
 
             elif sym in "1234567890":
                 self.SceneTxt = self.SceneTxt + sym
+            elif sym == 'minus':
+                self.SceneTxt1 = self.SceneTxt
+                self.SceneTxt = ""
             else:
                 print('bad scene number')
                 self.ScenePress = False
         elif sym in "t":
+            self.SceneTxt1 = ''
+            self.SceneTxt = ''
             self.ScenePress = True
         elif sym in "R":
             vtkCuv.ReReadFile()
@@ -675,17 +690,17 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
                 vtkCuv.ContDraw = True
                 vtkCuv.Lighting = False
             vtkCuv.ReDraw()
-        elif sym in "L":
-            if vtkCuv.Lighting:
-                vtkCuv.Lighting = False
-            else:
-                vtkCuv.Lighting = True
-            vtkCuv.ReDraw()
         elif sym in "V":
             if vtkCuv.VectDraw:
                 vtkCuv.VectDraw = False
             else:
                 vtkCuv.VectDraw = True
+            vtkCuv.ReDraw()
+        elif sym in "L":
+            if vtkCuv.Lighting:
+                vtkCuv.Lighting = False
+            else:
+                vtkCuv.Lighting = True
             vtkCuv.ReDraw()
         elif sym in "h":
             vtkCuv.ShowHelp()
@@ -961,26 +976,37 @@ class CreateVtkCuv(object):
         else:
             self.camera.ParallelProjectionOn()
 
-    def SceneToggleVis(self,n):
+    def SceneToggleVis(self, n0, n1):
 
-        if n < 0 or n >= len(self.scenes):
+        if n1 == -1:
+            n1 = n0
+
+        if n0 == -1:
+            n0 = n1
+
+        if n0 == -1 and n1 == -1:
+            print('Bad Scene number(s)')
+            return
+
+        if n0 < 0 or n0 >= len(self.scenes) or n1 < 0 or n1 >= len(self.scenes):
             print('Bad Scene number')
             return
 
-        self.scenes[n].visible = not self.scenes[n].visible
+        for n in range(n0, n1+1):
+            self.scenes[n].visible = not self.scenes[n].visible
 
-        if self.scenes[n].visible:
-            print('Scene {} on'.format(n+1))
-        else:
-            print('Scene {} off'.format(n+1))
+            if self.scenes[n].visible:
+                print('Scene {} on'.format(n+1))
+            else:
+                print('Scene {} off'.format(n+1))
 
     def PrintSceneInfo(self):
         print('\nScenes: ')
 
         for s in self.scenes:
 
-            print ('\t Scene \'{}\' {} Vis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {} vecs {}'.format(
-                s.label, s.n, s.visible, s.edgeActor.GetVisibility(),
+            print ('\t {:>3} \t{:>20} \tVis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {:>6} vecs {}'.format(
+                s.n, s.label, s.visible, s.edgeActor.GetVisibility(),
                 s.surfActor.GetVisibility(),
                 s.contActor.GetVisibility(),
                 s.glyphActor.GetVisibility(),
@@ -991,7 +1017,9 @@ class CreateVtkCuv(object):
 
     def ShowHelp(self):
         print('\nKey board commands:')
-        print('\tt: Toggle screen visibility. Command sequence: s <scene number> s')
+        print('\tt: Toggle screen visibility.')
+        print('\t\t1) Command sequence single scene: t <scene number> t')
+        print('\t\t2) Command sequence scene range: t <scene number> - <scene number t')
         print('\ta: Draw all scenes')
         print('\tn: Don\'t draw any scenes')
         print('\tp: toggle perspective view')
