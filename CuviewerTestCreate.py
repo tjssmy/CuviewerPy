@@ -25,6 +25,18 @@ cuviewer.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
 
 cuviewer.WriteSceneEnd(fid)
 
+cuviewer.WriteSceneBegin(fid, '2 Points')
+
+p1 = [0.2, 0.3, 0.4]
+color = [1, 0, 0]
+cuviewer.Write_GL_point(fid, p1, color, 0.0);
+
+p1 = [0.2, 0.7, 0.1]
+color = [1,0,1]
+cuviewer.Write_GL_point(fid, p1, color, 0.0);
+
+cuviewer.WriteSceneEnd(fid)
+
 cuviewer.WriteSceneBegin(fid, 'Quads')
 nx = 101
 ny = 11
@@ -53,7 +65,7 @@ for j in range(0, ny-1):
         color4 = [x[i+1],0,1-x[i+1]]
 
         cuviewer.Write_GL_quad(fid, p1, p2, p3, p4, color1, color2, color3, color4, 0.0, 1, 1)
-        cuviewer.Write_GL_vector(fid,p1,vec)
+        # cuviewer.Write_GL_vector(fid,p1,vec)
 
 cuviewer.WriteSceneEnd(fid)
 

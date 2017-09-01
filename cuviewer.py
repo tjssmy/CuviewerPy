@@ -352,6 +352,7 @@ class Scene(object):
         self.colors.SetNumberOfComponents(3)
         self.colors.SetName("Colors")
 
+        self.verts = vtk.vtkCellArray()
         self.lines = vtk.vtkCellArray()
         self.polys = vtk.vtkCellArray()
 
@@ -408,13 +409,11 @@ class Scene(object):
                 t = [color[0][0]]
                 self.temps.InsertNextTypedTuple(t)
                 col = tuple(color[0])
-                try:
-                    self.colors.InsertNextTypedTuple(col)
-                except:
-                    pass
+                self.colors.InsertNextTypedTuple(col)
 
-
-        if type == 'L':
+        if type == 'P':
+            return pid[0]
+        elif type == 'L':
             line = vtk.vtkLine()
             line.GetPointIds().SetId(0, pid[0])
             line.GetPointIds().SetId(1, pid[1])
@@ -460,8 +459,7 @@ class Scene(object):
             while tag != END_SCENE:
 
                 if tag == SPOINT:
-                    # self.points.InsertNextPoint(self.GetVtkPoly(fid, fdata, 1, bytesMirrored, 'P'))
-                    pass
+                    self.verts.InsertNextCell(self.GetVtkPoly(fid, fdata, 1, bytesMirrored, 'P'))
                 elif tag == SLINE:
                     self.lines.InsertNextCell(self.GetVtkPoly(fid, fdata, 2, bytesMirrored, 'L'))
                 elif tag == STRIA:
@@ -481,6 +479,7 @@ class Scene(object):
                 tag = ReadTag(fid, fdata)
 
             self.vtkSurfPolyData.SetPoints(self.points)
+            self.vtkSurfPolyData.SetVerts(self.verts)
             self.vtkSurfPolyData.SetLines(self.lines)
             self.vtkSurfPolyData.SetPolys(self.polys)
             self.vtkSurfPolyData.GetPointData().SetScalars(self.colors)
@@ -1093,6 +1092,20 @@ def WriteGLColorAndTrans(fid,color,trans):
     WriteGLFloats(fid, color)
     if trans != 0.0:
         WriteGLFloats(fid, trans)
+
+def Write_GL_point(fid, p1, color, trans):
+
+    WriteGLTag(fid, SPOINT)
+
+    flags = SFILL
+    WriteGLTag(fid, flags)
+
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, color)
+
+    if flags[0] & STRANSPARENT[0]:
+        WriteGLFloats(fid, trans)
+
 
 def Write_GL_line(fid, p1, p2, color, color2, trans, multi):
 
