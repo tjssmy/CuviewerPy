@@ -459,7 +459,8 @@ class Scene(object):
             while tag != END_SCENE:
 
                 if tag == SPOINT:
-                    self.verts.InsertNextCell(self.GetVtkPoly(fid, fdata, 1, bytesMirrored, 'P'))
+                    self.verts.InsertNextCell(1)
+                    self.verts.InsertCellPoint(self.GetVtkPoly(fid, fdata, 1, bytesMirrored, 'P'))
                 elif tag == SLINE:
                     self.lines.InsertNextCell(self.GetVtkPoly(fid, fdata, 2, bytesMirrored, 'L'))
                 elif tag == STRIA:
@@ -508,6 +509,7 @@ class Scene(object):
         self.surfActor = vtk.vtkActor()
         self.surfActor.SetMapper(self.surfMapper)
         self.surfActor.GetProperty().SetLineWidth(2.0)
+        self.surfActor.GetProperty().SetPointSize(20)
 
         self.contMapper = vtk.vtkPolyDataMapper()
         scalarRange = self.vtkContPolyData.GetScalarRange()
@@ -1103,8 +1105,8 @@ def Write_GL_point(fid, p1, color, trans):
     WriteGLFloats(fid, p1)
     WriteGLFloats(fid, color)
 
-    if flags[0] & STRANSPARENT[0]:
-        WriteGLFloats(fid, trans)
+    # if flags[0] & STRANSPARENT[0]:
+    #     WriteGLFloats(fid, trans)
 
 
 def Write_GL_line(fid, p1, p2, color, color2, trans, multi):

@@ -7,7 +7,23 @@ output_file = 'Test.gl'
 
 fid = cuviewer.WriteInitGLFile(output_file)
 
+cuviewer.WriteSceneBegin(fid, '2 Points')
+
+p1 = [0.2, 0.3, 0.4]
+color = [1, 0, 0]
+cuviewer.Write_GL_point(fid, p1, color, 0.0);
+
+p1 = [0.2, 0.7, 0.1]
+color = [1, 0, 1]
+cuviewer.Write_GL_point(fid, p1, color, 0.0);
+
+cuviewer.WriteSceneEnd(fid)
+
 cuviewer.WriteSceneBegin(fid, '3 lines')
+
+p1 = [0.2, 0.3, 1.4]
+color = [1, 1, 0]
+cuviewer.Write_GL_point(fid, p1, color, 0.0);
 
 p1 = [0, 0, 0]
 p2 = [0, 0, 2]
@@ -27,15 +43,13 @@ cuviewer.WriteSceneEnd(fid)
 
 cuviewer.WriteSceneBegin(fid, '2 Points')
 
-p1 = [0.2, 0.3, 0.4]
-color = [1, 0, 0]
-cuviewer.Write_GL_point(fid, p1, color, 0.0);
 
-p1 = [0.2, 0.7, 0.1]
-color = [1,0,1]
+p1 = [0.2, 0.7, 1.1]
+color = [1, 0.2, 1]
 cuviewer.Write_GL_point(fid, p1, color, 0.0);
 
 cuviewer.WriteSceneEnd(fid)
+
 
 cuviewer.WriteSceneBegin(fid, 'Quads')
 nx = 101
