@@ -509,7 +509,7 @@ class Scene(object):
         self.surfActor = vtk.vtkActor()
         self.surfActor.SetMapper(self.surfMapper)
         self.surfActor.GetProperty().SetLineWidth(2.0)
-        self.surfActor.GetProperty().SetPointSize(20)
+        self.surfActor.GetProperty().SetPointSize(8.0)
 
         self.contMapper = vtk.vtkPolyDataMapper()
         scalarRange = self.vtkContPolyData.GetScalarRange()
