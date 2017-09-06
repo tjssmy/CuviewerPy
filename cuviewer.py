@@ -501,6 +501,28 @@ class Scene(object):
         tag = ReadTag(fid, fdata)
         return tag
 
+    def CreateArrowsGlyphs(self):
+
+        # Source for the glyph filter
+        self.arrow = vtk.vtkArrowSource()
+        self.arrow.SetTipResolution(16)
+        self.arrow.SetTipLength(0.3)
+        self.arrow.SetTipRadius(0.1)
+
+        self.glyph = vtk.vtkGlyph3D()
+        self.glyph.SetSourceConnection(self.arrow.GetOutputPort())
+        self.glyph.AddInputData(self.vtkVectPolyData)
+        self.glyph.SetVectorModeToUseVector()
+        self.glyph.SetScaleFactor(1)
+        # glyph.SetColorModeToColorByScalar()
+
+        self.glyph.SetScaleModeToScaleByVector()
+        self.glyph.OrientOn()
+        self.glyph.Update()
+
+    def ResetArrowGlyphScale(self, sc):
+        self.glyph.SetScaleFactor(self.glyph.GetScaleFactor()*sc)
+
     def CreateVtkMapperActor(self):
 
         self.surfMapper = vtk.vtkPolyDataMapper()
@@ -567,24 +589,10 @@ class Scene(object):
         self.edgeActor.VisibilityOff()
 
         # Source for the glyph filter
-        arrow = vtk.vtkArrowSource()
-        arrow.SetTipResolution(16)
-        arrow.SetTipLength(0.3)
-        arrow.SetTipRadius(0.1)
-
-        glyph = vtk.vtkGlyph3D()
-        glyph.SetSourceConnection(arrow.GetOutputPort())
-        glyph.AddInputData(self.vtkVectPolyData)
-        glyph.SetVectorModeToUseVector()
-        glyph.SetScaleFactor(1)
-        # glyph.SetColorModeToColorByScalar()
-
-        glyph.SetScaleModeToScaleByVector()
-        glyph.OrientOn()
-        glyph.Update()
+        self.CreateArrowsGlyphs()
 
         self.glyphMapper = vtk.vtkPolyDataMapper()
-        self.glyphMapper.SetInputConnection(glyph.GetOutputPort())
+        self.glyphMapper.SetInputConnection(self.glyph.GetOutputPort())
         self.glyphMapper.SetScalarModeToUsePointFieldData()
         # self.glyphMapper.SetColorModeToMapScalars()
         self.glyphMapper.ScalarVisibilityOn()
@@ -690,6 +698,12 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
             else:
                 vtkCuv.ContDraw = True
                 vtkCuv.Lighting = False
+            vtkCuv.ReDraw()
+        elif sym == 'minus':
+            vtkCuv.ResetArrowGlyphScale(0.9)
+            vtkCuv.ReDraw()
+        elif sym == 'plus':
+            vtkCuv.ResetArrowGlyphScale(1.1)
             vtkCuv.ReDraw()
         elif sym in "V":
             if vtkCuv.VectDraw:
@@ -920,6 +934,11 @@ class CreateVtkCuv(object):
         self.AddActors()
         self.ReDraw()
 
+    def ResetArrowGlyphScale(self,sc):
+
+        for s in self.scenes:
+            s.ResetArrowGlyphScale(sc)
+
     def ReDraw(self):
 
         for s in self.scenes:
@@ -1037,6 +1056,8 @@ class CreateVtkCuv(object):
         print('\tR: Reread and render file')
         print('\tL: Toggle lighting on/off')
         print('\tV: Toggle vectors on/off')
+        print('\t+: Increase vectors size')
+        print('\t-: Increase vectors size')
         print('\th: This message')
 
 def WriteGLTag(fid, tag):
