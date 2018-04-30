@@ -605,6 +605,7 @@ class Scene(object):
         self.glyphActor.GetProperty().SetColor(0.3, 0.3, 0.0)
         self.glyphActor.SetMapper(self.glyphMapper)
 
+
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
 
     def __init__(self, vtkCuv):
@@ -1025,7 +1026,7 @@ class CreateVtkCuv(object):
 
         for s in self.scenes:
 
-            print ('\t {:>3} \t{:>20} \tVis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {:>6} vecs {}'.format(
+            print ('\t {:>3} \t{:>40} \tVis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {:>6} vecs {}'.format(
                 s.n, s.label, s.visible, s.edgeActor.GetVisibility(),
                 s.surfActor.GetVisibility(),
                 s.contActor.GetVisibility(),
