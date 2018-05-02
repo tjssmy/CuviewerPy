@@ -451,13 +451,15 @@ class Scene(object):
             tag = ReadTag(fid, fdata)
 
         if tag != END_SCENE:
-
             print('Reading Scene: \'{}\' {} ... '.format(self.label,n), end='');
             sys.stdout.flush()
             tic()
-
+            options = {
+                SQUADRI: lambda poly: self.polys.InsertNextCell(poly)
+            }
             while tag != END_SCENE:
-
+                options[tag](self.GetVtkPoly(fid, fdata, 4, bytesMirrored, 'Q'))
+                '''
                 if tag == SPOINT:
                     self.verts.InsertNextCell(1)
                     self.verts.InsertCellPoint(self.GetVtkPoly(fid, fdata, 1, bytesMirrored, 'P'))
@@ -467,6 +469,7 @@ class Scene(object):
                     self.polys.InsertNextCell(self.GetVtkPoly(fid, fdata, 3, bytesMirrored, 'T'))
                 elif tag == SQUADRI:
                     self.polys.InsertNextCell(self.GetVtkPoly(fid, fdata, 4, bytesMirrored, 'Q'))
+                    #print('I am here!!')
                 elif tag == SSPHERE:
                     self.spheres.append(ReadSphere(fid, fdata, bytesMirrored))
                 elif tag == SSPHOID:
@@ -476,9 +479,10 @@ class Scene(object):
                     pass
                 elif tag == SVECTOR:
                     self.AddVtkVector(fid, fdata, bytesMirrored)
-
+                '''
                 tag = ReadTag(fid, fdata)
 
+            toc()
             self.vtkSurfPolyData.SetPoints(self.points)
             self.vtkSurfPolyData.SetVerts(self.verts)
             self.vtkSurfPolyData.SetLines(self.lines)
@@ -496,7 +500,7 @@ class Scene(object):
             self.vtkContPolyData.SetPolys(self.polys)
             self.vtkContPolyData.GetPointData().SetScalars(self.temps)
             print('done. ', end='')
-            toc()
+            #toc()
 
         tag = ReadTag(fid, fdata)
         return tag
@@ -731,12 +735,12 @@ class cuvFileData(object):
 
         try:
             fid = open(file, 'rb')
-
             self.data = fid.read()
             fid.close()
         except IOError:
             print("Could not read file: {}".format(file))
             exit()
+
 
 class CreateVtkCuv(object):
 
@@ -835,6 +839,7 @@ class CreateVtkCuv(object):
             self.scenes.append(scene)
             tag = scene.ReadScene(self.fid, self.fdata, nScene, self.bytesMirrored)
             nScene = nScene + 1
+            print('Create and read scenes')
 
         if tag != BEGIN_VIEW:
             return False
@@ -887,7 +892,6 @@ class CreateVtkCuv(object):
         self.renderer.ResetCamera()
         self.SetView('v')
 
-
     def SetView(self,view):
 
         npos = self.camera.GetPosition()
@@ -925,7 +929,6 @@ class CreateVtkCuv(object):
         self.renderer.ResetCamera()
 
         self.ReDraw()
-
 
     def ReReadFile(self):
         
@@ -1035,7 +1038,6 @@ class CreateVtkCuv(object):
                 s.vtkSurfPolyData.GetNumberOfPolys(),
                 s.vtkVectPolyData.GetNumberOfVerts()))
 
-
     def ShowHelp(self):
         print('\nKey board commands:')
         print('\tt: Toggle screen visibility.')
@@ -1060,6 +1062,7 @@ class CreateVtkCuv(object):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
+
 
 def WriteGLTag(fid, tag):
     fid.write(tag)
@@ -1203,7 +1206,6 @@ def Write_GL_quad(fid, p1, p2, p3, p4,  color, color2, color3, color4, trans, mu
         WriteGLColorAndTrans(fid, color2, trans)
         WriteGLColorAndTrans(fid, color3, trans)
         WriteGLColorAndTrans(fid, color4, trans)
-
 
 def Write_GL_vector(fid, p0, vec):
 
