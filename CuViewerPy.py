@@ -3,13 +3,7 @@
 import cuviewer
 import sys
 import argparse
-'''
-if len(sys.argv) != 2:
-    print("wrong")
-    exit()
 
-input_file = sys.argv[1]
-'''
 def main(input_file):
 	vtkCuv = cuviewer.CreateVtkCuv()
 	vtkCuv.ReadCuvFile(input_file)
