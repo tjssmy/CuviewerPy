@@ -1,57 +1,60 @@
 import numpy as np
 import cuviewer
+import WriteGLFile as w
+import random
 
 # Create gl file
 
 output_file = 'Test.gl'
 
-fid = cuviewer.WriteInitGLFile(output_file)
+fid = w.WriteInitGLFile(output_file)
 
-cuviewer.WriteSceneBegin(fid, '2 Points')
+w.WriteSceneBegin(fid, '100000 Points')
 
-p1 = [0.2, 0.3, 0.4]
-color = [1, 0, 0]
-cuviewer.Write_GL_point(fid, p1, color, 0.0);
+for x in range(100000):
+    p1 = [random.random(), random.random(),  random.random()]
+    color = [1, 0, 0]
+    w.Write_GL_point(fid, p1, color, 0.0);
 
-p1 = [0.2, 0.7, 0.1]
-color = [1, 0, 1]
-cuviewer.Write_GL_point(fid, p1, color, 0.0);
+#p1 = [0.2, 0.7, 0.1]
+#color = [1, 0, 1]
+#w.Write_GL_point(fid, p1, color, 0.0);
 
-cuviewer.WriteSceneEnd(fid)
-
-cuviewer.WriteSceneBegin(fid, '3 lines')
+w.WriteSceneEnd(fid)
+'''
+w.WriteSceneBegin(fid, '3 lines')
 
 p1 = [0.2, 0.3, 1.4]
 color = [1, 1, 0]
-cuviewer.Write_GL_point(fid, p1, color, 0.0);
+w.Write_GL_point(fid, p1, color, 0.0);
 
 p1 = [0, 0, 0]
 p2 = [0, 0, 2]
 color = [0, 0, 1]
 color2 = [1,0,0]
-cuviewer.Write_GL_line(fid, p1, p2, color, color, 0.0, 1)
+w.Write_GL_line(fid, p1, p2, color, color, 0.0, 1)
 
 p1 = [0, 0, 0.0]
 p2 = [0, 0.5, 0.0]
-cuviewer.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
+w.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
 
 p1 = [0, 0, 0.0]
 p2 = [1, 0.0, 0.0]
-cuviewer.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
+w.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
 
-cuviewer.WriteSceneEnd(fid)
+w.WriteSceneEnd(fid)
 
-cuviewer.WriteSceneBegin(fid, '2 Points')
+w.WriteSceneBegin(fid, '2 Points')
 
 
 p1 = [0.2, 0.7, 1.1]
 color = [1, 0.2, 1]
-cuviewer.Write_GL_point(fid, p1, color, 0.0);
+w.Write_GL_point(fid, p1, color, 0.0);
 
-cuviewer.WriteSceneEnd(fid)
+w.WriteSceneEnd(fid)
 
 
-cuviewer.WriteSceneBegin(fid, 'Quads')
+w.WriteSceneBegin(fid, 'Quads')
 nx = 101
 ny = 11
 
@@ -78,12 +81,12 @@ for j in range(0, ny-1):
         color3 = [x[i+1],0,1-x[i+1]]
         color4 = [x[i+1],0,1-x[i+1]]
 
-        cuviewer.Write_GL_quad(fid, p1, p2, p3, p4, color1, color2, color3, color4, 0.0, 1, 1)
-        # cuviewer.Write_GL_vector(fid,p1,vec)
+        w.Write_GL_quad(fid, p1, p2, p3, p4, color1, color2, color3, color4, 0.0, 1, 1)
+        # w.Write_GL_vector(fid,p1,vec)
 
-cuviewer.WriteSceneEnd(fid)
+w.WriteSceneEnd(fid)
 
-cuviewer.WriteSceneBegin(fid, 'Triangles')
+w.WriteSceneBegin(fid, 'Triangles')
 nx = 101
 ny = 11
 
@@ -102,16 +105,16 @@ for j in range(0, ny - 1):
         color2 = [x[i],0,1-x[i]]
         color3 = [x[i+1],0,1-x[i+1]]
 
-        cuviewer.Write_GL_tri(fid, p1, p2, p3, color1, color2, color3, 0.0, 1, 1)
+        w.Write_GL_tri(fid, p1, p2, p3, color1, color2, color3, 0.0, 1, 1)
 
 
-cuviewer.WriteSceneEnd(fid)
+w.WriteSceneEnd(fid)
 
-cuviewer.WriteSceneBegin(fid, '')
+w.WriteSceneBegin(fid, '')
 
-cuviewer.WriteSceneEnd(fid)
-
-cuviewer.WriteCloseGLFile(fid)
+w.WriteSceneEnd(fid)
+'''
+w.WriteCloseGLFile(fid)
 
 # Read and View
 

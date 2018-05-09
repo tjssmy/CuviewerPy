@@ -4,6 +4,7 @@ import math
 import sys
 import struct
 import time
+import re
 
 def tic():
     #Homemade version of matlab tic and toc functions
@@ -14,7 +15,7 @@ def tic():
 def toc():
     import time
     if 'startTime_for_tictoc' in globals():
-        print("Elapsed time is " + str(time.time() - startTime_for_tictoc) + " seconds.")
+        print("Elapsed time is {0:8f} seconds.".format(float(str(time.time() - startTime_for_tictoc))))
     else:
         print("Toc: start time not set")
 
@@ -53,6 +54,7 @@ END_VIEW = bytes.fromhex('AC')
 
 # tags while in the scene section
 SPOINT = bytes.fromhex('00')
+SPOINTMANY = bytes.fromhex('08')
 SLINE = bytes.fromhex('01')
 STRIA = bytes.fromhex('02')
 SQUADRI = bytes.fromhex('03')
@@ -345,6 +347,7 @@ class Scene(object):
 
     def __init__(self):
         self.label = 'N/A'
+        self.number = 0
 
         self.points = vtk.vtkPoints()
         self.vecPoints = vtk.vtkPoints()
@@ -439,6 +442,31 @@ class Scene(object):
             quad.GetPointIds().SetId(2, pid[2])
             quad.GetPointIds().SetId(3, pid[3])
             return quad
+
+    def GetVtkPoly2(self, fdata, n, no_of_poly, bytesMirrored, shape_type):
+        geo = []
+        pid = []
+
+        fill, out, trans, multi = ReadFlags(fdata)
+
+        for i in range(0, n*no_of_poly):           
+            geo.append(ReadFloats(fdata, np.float32, 3, bytesMirrored))
+            pid.append(self.points.InsertNextPoint(geo[i]))
+            color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
+            if multi:
+                t = [color[i][0]]
+                self.temps.InsertNextTypedTuple(t)
+                col = tuple(color[i])
+                self.colors.InsertNextTypedTuple(col)
+
+            else:
+                t = [color[0][0]]
+                self.temps.InsertNextTypedTuple(t)
+                col = tuple(color[0])
+                self.colors.InsertNextTypedTuple(col)
+
+        if shape_type == 'P':
+            return pid
    
     def ReadScene(self, fdata, n, bytesMirrored):
 
@@ -454,6 +482,7 @@ class Scene(object):
                 tag = ReadTag(fdata)
 
             self.label = label.decode('ascii')
+            self.number = int(re.search(r"\d+", self.label).group(0))
             tag = ReadTag(fdata)
 
         if tag != END_SCENE:
@@ -463,6 +492,7 @@ class Scene(object):
             
             options = {
                 SPOINT:  lambda fdata, bytesMirrored: self.InsertSPOINT(  fdata, bytesMirrored),
+                SPOINTMANY:  lambda fdata, bytesMirrored: self.InsertSPOINTMANY(  fdata, bytesMirrored),
                 SLINE:   lambda fdata, bytesMirrored: self.InsertSLINE(   fdata, bytesMirrored),
                 STRIA:   lambda fdata, bytesMirrored: self.InsertSTRIA(   fdata, bytesMirrored),
                 SQUADRI: lambda fdata, bytesMirrored: self.InsertSQUADRI( fdata, bytesMirrored),
@@ -501,6 +531,13 @@ class Scene(object):
     def InsertSPOINT(self, fdata, bytesMirrored):
         self.verts.InsertNextCell(1)
         self.verts.InsertCellPoint(self.GetVtkPoly(fdata, 1, bytesMirrored, 'P'))
+
+            
+    def InsertSPOINTMANY(self, fdata, bytesMirrored):
+        pid = self.GetVtkPoly2(fdata, 1, self.number, bytesMirrored, 'P')
+        for i in range(len(pid)):
+            self.verts.InsertNextCell(1)
+            self.verts.InsertCellPoint(pid[i])
         
     def InsertSLINE(self, fdata, bytesMirrored):
         self.lines.InsertNextCell(self.GetVtkPoly(fdata, 2, bytesMirrored, 'L'))
@@ -1078,154 +1115,4 @@ class CreateVtkCuv(object):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
-
-
-def WriteGLTag(fid, tag):
-    fid.write(tag)
-
-def WriteGLCheck(fid):
-    ch = np.int32(DATA_ORDER_CHECK)
-    np.array([ch]).tofile(fid)
-
-def WriteGLString(fid,str):
-    strBA = bytearray(str,'utf8')
-    fid.write(strBA)
-
-def WriteInitGLFile(file):
-
-    fid = open(file,'wb')
-
-    WriteGLCheck(fid)
-    WriteGLTag(fid, BEGIN_DATA)
-    WriteGLTag(fid, BEGIN_VERSION)
-    WriteGLString(fid, VERSION_STRING)
-    WriteGLTag(fid, END_VERSION)
-
-    return fid
-
-def WriteSceneBegin(fid,label):
-
-    WriteGLTag(fid, BEGIN_SCENE)
-    if label != '':
-        WriteGLTag(fid, BEGIN_SCENE_LABEL)
-        WriteGLString(fid,label)
-        WriteGLTag(fid, END_SCENE_LABEL)
-
-def WriteSceneEnd(fid):
-
-    WriteGLTag(fid, END_SCENE)
-
-def WriteCloseGLFile(fid):
-
-    WriteGLTag(fid, BEGIN_VIEW);
-
-    WriteGLTag(fid, VPRESET_VIEW);
-    WriteGLTag(fid, bytes([0]));
-    WriteGLTag(fid, END_VIEW);
-    WriteGLTag(fid, END_DATA_STAY);
-    fid.close()
-
-def WriteGLFloats(fid, vec):
-
-    for f in vec:
-        v = np.float32(f)
-        np.array([v]).tofile(fid)
-
-def WriteGLColorAndTrans(fid,color,trans):
-    WriteGLFloats(fid, color)
-    if trans != 0.0:
-        WriteGLFloats(fid, trans)
-
-def Write_GL_point(fid, p1, color, trans):
-
-    WriteGLTag(fid, SPOINT)
-
-    flags = SFILL
-    WriteGLTag(fid, flags)
-
-    WriteGLFloats(fid, p1)
-    WriteGLFloats(fid, color)
-
-    # if flags[0] & STRANSPARENT[0]:
-    #     WriteGLFloats(fid, trans)
-
-
-def Write_GL_line(fid, p1, p2, color, color2, trans, multi):
-
-    WriteGLTag(fid,SLINE)
-
-    flags = SOUTLINE
-    if trans != 0.0:
-        flags = bytes([flags[0] | STRANSPARENT[0]])
-    if multi:
-        flags = bytes([flags[0] | SMULTICOLOR[0]])
-
-    WriteGLTag(fid, flags)
-
-    WriteGLFloats(fid, p1)
-    WriteGLFloats(fid, p2)
-
-    WriteGLFloats(fid, color)
-
-    if flags[0] & SMULTICOLOR[0]:
-        WriteGLFloats(fid, color2)
-
-    if flags[0] & STRANSPARENT[0]:
-        WriteGLFloats(fid, trans)
-
-def Write_GL_tri(fid, p1, p2, p3, color, color2, color3, trans, multi, out):
-
-    WriteGLTag(fid,STRIA)
-
-    flags = SFILL
-    if trans != 0.0:
-        flags =  bytes([flags[0] | STRANSPARENT[0]])
-    if multi:
-        flags =  bytes([flags[0] | SMULTICOLOR[0]])
-    if out:
-        flags =  bytes([flags[0] | SOUTLINE[0]])
-
-    WriteGLTag(fid, flags)
-
-    WriteGLFloats(fid, p1)
-    WriteGLFloats(fid, p2)
-    WriteGLFloats(fid, p3)
-
-    WriteGLColorAndTrans(fid, color, trans)
-
-    if flags[0] & SMULTICOLOR[0]:
-        WriteGLColorAndTrans(fid, color2, trans)
-        WriteGLColorAndTrans(fid, color3, trans)
-
-def Write_GL_quad(fid, p1, p2, p3, p4,  color, color2, color3, color4, trans, multi, out):
-
-    WriteGLTag(fid, SQUADRI)
-
-    flags = SFILL
-    if trans != 0.0:
-        flags =  bytes([flags[0] | STRANSPARENT[0]])
-    if multi:
-        flags =  bytes([flags[0] | SMULTICOLOR[0]])
-    if out:
-        flags =  bytes([flags[0] | SOUTLINE[0]])
-
-    WriteGLTag(fid, flags)
-
-    WriteGLFloats(fid, p1)
-    WriteGLFloats(fid, p2)
-    WriteGLFloats(fid, p3)
-    WriteGLFloats(fid, p4)
-
-    WriteGLColorAndTrans(fid, color, trans)
-
-    if flags[0] & SMULTICOLOR[0]:
-        WriteGLColorAndTrans(fid, color2, trans)
-        WriteGLColorAndTrans(fid, color3, trans)
-        WriteGLColorAndTrans(fid, color4, trans)
-
-def Write_GL_vector(fid, p0, vec):
-
-    WriteGLTag(fid, SVECTOR)
-    WriteGLFloats(fid, p0)
-    WriteGLFloats(fid, vec)
 
