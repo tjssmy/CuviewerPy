@@ -16,34 +16,21 @@ for x in range(100000):
     color = [1, 0, 0]
     w.Write_GL_point(fid, p1, color, 0.0);
 
-#p1 = [0.2, 0.7, 0.1]
-#color = [1, 0, 1]
-#w.Write_GL_point(fid, p1, color, 0.0);
+w.WriteSceneEnd(fid)
+
+
+w.WriteSceneBegin(fid, '100000 lines')
+
+for x in range(100000):
+    p1 = [0, 0, 0]
+    p2 = [random.randint(1,10), random.randint(1,10), random.randint(1,10)]
+    c1 = [0, 0, 1]
+    c2 = [1, 0, 0]
+    w.Write_GL_line(fid, p1, p2, c1, c2, 0.0, 1)
+
 
 w.WriteSceneEnd(fid)
 '''
-w.WriteSceneBegin(fid, '3 lines')
-
-p1 = [0.2, 0.3, 1.4]
-color = [1, 1, 0]
-w.Write_GL_point(fid, p1, color, 0.0);
-
-p1 = [0, 0, 0]
-p2 = [0, 0, 2]
-color = [0, 0, 1]
-color2 = [1,0,0]
-w.Write_GL_line(fid, p1, p2, color, color, 0.0, 1)
-
-p1 = [0, 0, 0.0]
-p2 = [0, 0.5, 0.0]
-w.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
-
-p1 = [0, 0, 0.0]
-p2 = [1, 0.0, 0.0]
-w.Write_GL_line(fid, p1, p2, color, color2, 0.0, 1)
-
-w.WriteSceneEnd(fid)
-
 w.WriteSceneBegin(fid, '2 Points')
 
 

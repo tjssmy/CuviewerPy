@@ -82,6 +82,18 @@ def Write_GL_point(fid, p1, color, trans):
     # if flags[0] & STRANSPARENT[0]:
     #     WriteGLFloats(fid, trans)
 
+def write_GL_lines_position(fid, p1, p2):
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, p2)
+    
+def write_GL_lines_color(fid, c1, c2, flags):
+    WriteGLFloats(fid, c1)
+
+    if flags[0] & c.SMULTICOLOR[0]:
+        WriteGLFloats(fid, c2)
+
+    if flags[0] & c.STRANSPARENT[0]:
+        WriteGLFloats(fid, flags[0])
 
 def Write_GL_line(fid, p1, p2, color, color2, trans, multi):
 
