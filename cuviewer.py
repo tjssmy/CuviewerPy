@@ -58,7 +58,9 @@ MULTIPLE_SPOINT = bytes.fromhex('08')
 SLINE = bytes.fromhex('01')
 MULTIPLE_SLINE = bytes.fromhex('09')
 STRIA = bytes.fromhex('02')
+MULTIPLE_STRIA = bytes.fromhex('10')
 SQUADRI = bytes.fromhex('03')
+MULTIPLE_SQUADRI = bytes.fromhex('11')
 SSPHERE = bytes.fromhex('04')
 SSPHOID = bytes.fromhex('05')
 STEXT = bytes.fromhex('06')
@@ -486,19 +488,14 @@ class Scene(object):
 
         return pid
         
-    def GetVtkLines(self, fdata, n, no_of_lines, bytesMirrored):
-        #geo = []
-        #pid = []
+    def GetVtkPolys(self, fdata, n, no_of_lines, bytesMirrored):
         
         #Read flags
         fill, out, trans, multi = ReadFlags(fdata)
-        
         pid = []
         for i in range(0, no_of_lines):
             #Read Points
             for j in range (0, n):
-                #geo.append(ReadFloats(fdata, np.float32, 3, bytesMirrored))
-                #pid.append(self.points.InsertNextPoint(geo[j]))
                 pid.append(self.points.InsertNextPoint(ReadFloats(fdata, np.float32, 3, bytesMirrored)))
         
             #Read Colors
@@ -524,19 +521,6 @@ class Scene(object):
                 self.temps.InsertNextTypedTuple(t)
                 col = tuple(color[j])
                 self.colors.InsertNextTypedTuple(col)
-            '''    
-            color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
-            if multi:
-                t = [color[i][0]]
-                self.temps.InsertNextTypedTuple(t)
-                col = tuple(color[i])
-                self.colors.InsertNextTypedTuple(col)
-            else:
-                t = [color[0][0]]
-                self.temps.InsertNextTypedTuple(t)
-                col = tuple(color[0])
-                self.colors.InsertNextTypedTuple(col)
-            '''
         return pid
    
     def ReadScene(self, fdata, n, bytesMirrored):
@@ -562,16 +546,18 @@ class Scene(object):
             tic()
             
             options = {
-                SPOINT:      lambda fdata, bytesMirrored: self.InsertSPOINT(  fdata, bytesMirrored),
-                MULTIPLE_SPOINT:  lambda fdata, bytesMirrored: self.InsertMULTIPLESPOINT(  fdata, bytesMirrored),
-                SLINE:       lambda fdata, bytesMirrored: self.InsertSLINE(   fdata, bytesMirrored),
-                MULTIPLE_SLINE:lambda fdata, bytesMirrored: self.InsertMULTIPLESLINE(   fdata, bytesMirrored),
-                STRIA:       lambda fdata, bytesMirrored: self.InsertSTRIA(   fdata, bytesMirrored),
-                SQUADRI:     lambda fdata, bytesMirrored: self.InsertSQUADRI( fdata, bytesMirrored),
-                SSPHERE:     lambda fdata, bytesMirrored: self.InsertSSPHERE( fdata, bytesMirrored),
-                SSPHOID:     lambda fdata, bytesMirrored: self.InsertSSPHOID( fdata, bytesMirrored),
-                STEXT:       lambda fdata, bytesMirrored: self.InsertSTEXT(   fdata, bytesMirrored),
-                SVECTOR:     lambda fdata, bytesMirrored: self.InsertSVECTOR( fdata, bytesMirrored)
+                SPOINT:           lambda fdata, bytesMirrored: self.InsertSPOINT(fdata, bytesMirrored),
+                MULTIPLE_SPOINT:  lambda fdata, bytesMirrored: self.InsertMULTIPLESPOINT(fdata, bytesMirrored),
+                SLINE:            lambda fdata, bytesMirrored: self.InsertSLINE(fdata, bytesMirrored),
+                MULTIPLE_SLINE:   lambda fdata, bytesMirrored: self.InsertMULTIPLESLINE(fdata, bytesMirrored),
+                STRIA:            lambda fdata, bytesMirrored: self.InsertSTRIA(fdata, bytesMirrored),
+                MULTIPLE_STRIA:   lambda fdata, bytesMirrored: self.InsertMULTIPLESTRIA(fdata, bytesMirrored),
+                SQUADRI:          lambda fdata, bytesMirrored: self.InsertSQUADRI(fdata, bytesMirrored),
+                MULTIPLE_SQUADRI: lambda fdata, bytesMirrored: self.InsertMULTIPLESQUADRI(fdata, bytesMirrored),
+                SSPHERE:          lambda fdata, bytesMirrored: self.InsertSSPHERE(fdata, bytesMirrored),
+                SSPHOID:          lambda fdata, bytesMirrored: self.InsertSSPHOID(fdata, bytesMirrored),
+                STEXT:            lambda fdata, bytesMirrored: self.InsertSTEXT(fdata, bytesMirrored),
+                SVECTOR:          lambda fdata, bytesMirrored: self.InsertSVECTOR(fdata, bytesMirrored)
             }
 
             while tag != END_SCENE:
@@ -615,7 +601,7 @@ class Scene(object):
         self.lines.InsertNextCell(self.GetVtkPoly(fdata, 2, bytesMirrored, 'L'))
         
     def InsertMULTIPLESLINE(self, fdata, bytesMirrored):
-        pid  = self.GetVtkLines(fdata, 2, self.number, bytesMirrored)
+        pid  = self.GetVtkPolys(fdata, 2, self.number, bytesMirrored)
         line = vtk.vtkLine()
         for i in range(0, len(pid), 2):
             line.GetPointIds().SetId(0, pid[i])
@@ -626,8 +612,27 @@ class Scene(object):
         self.polys.InsertNextCell(self.GetVtkPoly(fdata, 3, bytesMirrored, 'T'))
         return
         
+    def InsertMULTIPLESTRIA(self, fdata, bytesMirrored):
+        pid  = self.GetVtkPolys(fdata, 3, self.number, bytesMirrored)
+        tri = vtk.vtkTriangle()
+        for i in range(0, len(pid), 3):
+            tri.GetPointIds().SetId(0, pid[i])
+            tri.GetPointIds().SetId(1, pid[i+1])
+            tri.GetPointIds().SetId(2, pid[i+2])
+            self.polys.InsertNextCell(tri)
+        
     def InsertSQUADRI(self, fdata, bytesMirrored):
         self.polys.InsertNextCell(self.GetVtkPoly(fdata, 4, bytesMirrored, 'Q'))
+    
+    def InsertMULTIPLESQUADRI(self, fdata, bytesMirrored):
+        pid  = self.GetVtkPolys(fdata, 4, self.number, bytesMirrored)
+        quad = vtk.vtkQuad()
+        for i in range(0, len(pid), 4):
+            quad.GetPointIds().SetId(0, pid[i])
+            quad.GetPointIds().SetId(1, pid[i+1])
+            quad.GetPointIds().SetId(2, pid[i+2])
+            quad.GetPointIds().SetId(3, pid[i+3])
+            self.polys.InsertNextCell(quad)
         
     def InsertSSPHERE(self, fdata, bytesMirrored):
         self.spheres.append(ReadSphere(fdata, bytesMirrored))

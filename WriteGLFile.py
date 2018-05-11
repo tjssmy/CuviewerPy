@@ -94,6 +94,7 @@ def write_GL_lines_color(fid, c1, c2, flags):
 
     if flags[0] & c.STRANSPARENT[0]:
         WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
 
 def Write_GL_line(fid, p1, p2, color, color2, trans, multi):
 
@@ -118,6 +119,24 @@ def Write_GL_line(fid, p1, p2, color, color2, trans, multi):
     if flags[0] & c.STRANSPARENT[0]:
         WriteGLFloats(fid, trans)
 
+def write_GL_triangles_position(fid, p1, p2, p3):
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, p2)
+    WriteGLFloats(fid, p3)
+
+def write_GL_triangles_color(fid, c1, c2, c3, flags):
+    WriteGLFloats(fid, c1)
+
+    if flags[0] & c.SMULTICOLOR[0]:
+        WriteGLFloats(fid, c2)
+        WriteGLFloats(fid, c3)
+        
+    if flags[0] & c.STRANSPARENT[0]:
+        WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
+	
+
 def Write_GL_tri(fid, p1, p2, p3, color, color2, color3, trans, multi, out):
 
     WriteGLTag(fid,c.STRIA)
@@ -138,9 +157,29 @@ def Write_GL_tri(fid, p1, p2, p3, color, color2, color3, trans, multi, out):
 
     WriteGLColorAndTrans(fid, color, trans)
 
-    if flags[0] & SMULTICOLOR[0]:
+    if flags[0] & c.SMULTICOLOR[0]:
         WriteGLColorAndTrans(fid, color2, trans)
         WriteGLColorAndTrans(fid, color3, trans)
+
+def write_GL_quad_position(fid, p1, p2, p3, p4):
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, p2)
+    WriteGLFloats(fid, p3)
+    WriteGLFloats(fid, p4)
+
+def write_GL_quad_color(fid, c1, c2, c3, c4, flags):
+    WriteGLFloats(fid, c1)
+
+    if flags[0] & c.SMULTICOLOR[0]:
+        WriteGLFloats(fid, c2)
+        WriteGLFloats(fid, c3)
+        WriteGLFloats(fid, c4)
+        
+    if flags[0] & c.STRANSPARENT[0]:
+        WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
+        WriteGLFloats(fid, flags[0])
 
 def Write_GL_quad(fid, p1, p2, p3, p4,  color, color2, color3, color4, trans, multi, out):
 
@@ -163,7 +202,7 @@ def Write_GL_quad(fid, p1, p2, p3, p4,  color, color2, color3, color4, trans, mu
 
     WriteGLColorAndTrans(fid, color, trans)
 
-    if flags[0] & SMULTICOLOR[0]:
+    if flags[0] & c.SMULTICOLOR[0]:
         WriteGLColorAndTrans(fid, color2, trans)
         WriteGLColorAndTrans(fid, color3, trans)
         WriteGLColorAndTrans(fid, color4, trans)
