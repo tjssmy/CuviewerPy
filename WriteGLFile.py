@@ -212,3 +212,28 @@ def Write_GL_vector(fid, p0, vec):
     WriteGLTag(fid, c.SVECTOR)
     WriteGLFloats(fid, p0)
     WriteGLFloats(fid, vec)
+    
+def Write_GL_sphere(fid, p1, r1, color, trans):
+	
+    WriteGLTag(fid, c.SSPHERE)
+	
+    flags = c.SFILL
+    WriteGLTag(fid, flags)
+    
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, r1)
+    WriteGLFloats(fid, color)
+    
+def Write_GL_spheroid(fid, p1, r1, color, trans):
+	
+    WriteGLTag(fid, c.SSPHOID)
+	
+    flags = c.SFILL
+    WriteGLTag(fid, flags)
+    
+    WriteGLFloats(fid, p1)
+    WriteGLFloats(fid, r1)
+    WriteGLFloats(fid, color)
+	    
+    
+

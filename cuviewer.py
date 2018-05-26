@@ -258,53 +258,24 @@ class Poly(object):
 class Sphere(object):
 
     def __init__(self, pos, rad, color, tr, fill, out):
-        self.pos = pos
-        self.rad = rad
-        self.color = color
-        self.tr = tr
-        self.fill = fill
-        self.out = out
-
-
-def ReadSphere(fid, fdata, bytesMirrored):
-
-     fill, out, trans, multi = ReadFlags(fdata)
-     multi = False
-
-     pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-     rad = ReadFloats(fdata, np.float32, 1, bytesMirrored)
-
-     color, tr = ReadColorAndTrans(fid, fdata, fill,out,multi,trans,0, bytesMirrored)
-
-     return Sphere(pos, rad, color, tr, fill, out)
+		
+        self.sphereSource = vtk.vtkSphereSource()
+        self.sphereSource.SetCenter(pos[0], pos[1], pos[2])
+        self.sphereSource.SetRadius(rad[0])
+        # Make the surface smooth.
+        self.sphereSource.SetPhiResolution(100)
+        self.sphereSource.SetThetaResolution(100)
 
 
 class Spheroid(object):
-
-    def __init__(self, pos, rad, axis, rot, color, tr, fill, out):
-        self.pos = pos
-        self.rad = rad
-        self.axis = axis
-        self.rot = rot
-        self.color = color
-        self.tr = tr
-        self.fill = fill
-        self.out = out
-
-
-def ReadSpheriod(fid, fdata, bytesMirrored):
-
-    fill, out, trans, multi = ReadFlags(fdata)
-    multi = False
-
-    pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-    rad = ReadFloats(fdata, np.float32, 1, bytesMirrored)
-    axis = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-    rot = ReadFloats(fdata, np.float32, 1, bytesMirrored)
-
-    color, tr = ReadColorAndTrans(fid, fdata, fill, out,multi,trans,0, bytesMirrored)
-
-    return Spheroid(pos, rad, axis, rot, color, tr, fill, out)
+	
+    def __init__(self, pos, rad, color, tr, fill, out):
+    #def __init__(self, pos, rad, axis, rot, color, tr, fill, out):
+        self.spheroidSource = vtk.vtkParametricEllipsoid()
+        self.spheroidSource.SetXRadius(rad[0])
+        self.spheroidSource.SetYRadius(rad[1])
+        self.spheroidSource.SetZRadius(rad[1])        
+        self.position = pos
 
 
 class Text(object):
@@ -403,6 +374,7 @@ class Scene(object):
         self.vtkContPolyData = vtk.vtkPolyData()
         self.vtkEdgePolyData = vtk.vtkPolyData()
         self.vtkVectPolyData = vtk.vtkPolyData()
+        
 
         self.visible = True
 
@@ -522,6 +494,31 @@ class Scene(object):
                 col = tuple(color[j])
                 self.colors.InsertNextTypedTuple(col)
         return pid
+
+    def GetVtkSphere(self, fdata, bytesMirrored):
+        fill, out, trans, multi = ReadFlags(fdata)
+        multi = False
+
+        pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        rad = ReadFloats(fdata, np.float32, 1, bytesMirrored)
+
+        color, tr = ReadColorAndTrans(fdata, fill,out,multi,trans,0, bytesMirrored)
+
+        return Sphere(pos, rad, color, tr, fill, out)
+
+    def GetVtkSpheroid(self, fdata, bytesMirrored):
+        fill, out, trans, multi = ReadFlags(fdata)
+        multi = False
+
+        pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        rad = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        #axis = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        #rot = ReadFloats(fdata, np.float32, 1, bytesMirrored)
+
+        color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, 0, bytesMirrored)
+
+        #return Spheroid(pos, rad, axis, rot, color, tr, fill, out)
+        return Spheroid(pos, rad, color, tr, fill, out)
    
     def ReadScene(self, fdata, n, bytesMirrored):
 
@@ -589,7 +586,6 @@ class Scene(object):
     def InsertSPOINT(self, fdata, bytesMirrored):
         self.verts.InsertNextCell(1)
         self.verts.InsertCellPoint(self.GetVtkPoly(fdata, 1, bytesMirrored, 'P'))
-
             
     def InsertMULTIPLESPOINT(self, fdata, bytesMirrored):
         pid = self.GetVtkPoints(fdata, 1, self.number, bytesMirrored)
@@ -635,10 +631,10 @@ class Scene(object):
             self.polys.InsertNextCell(quad)
         
     def InsertSSPHERE(self, fdata, bytesMirrored):
-        self.spheres.append(ReadSphere(fdata, bytesMirrored))
+        self.spheres.append(self.GetVtkSphere(fdata, bytesMirrored))
 
     def InsertSSPHOID(self, fdata, bytesMirrored):
-        self.spheroids.append(ReadSpheriod(fdata, bytesMirrored))
+        self.spheroids.append(self.GetVtkSpheroid(fdata, bytesMirrored))
 
     def InsertSTEXT(self, fdata, bytesMirrored):
         self.texts.append(ReadText(fdata,bytesMirrored,'T'))
@@ -750,6 +746,41 @@ class Scene(object):
         self.glyphActor = vtk.vtkActor()
         self.glyphActor.GetProperty().SetColor(0.3, 0.3, 0.0)
         self.glyphActor.SetMapper(self.glyphMapper)
+        
+        # Sphere Source
+        self.sphereMapper = list()
+        self.sphereActor = list()
+        for i in range(0, len(self.spheres)):
+            self.sphereMapper.append(vtk.vtkPolyDataMapper())
+            self.sphereMapper[i].SetInputConnection(self.spheres[i].sphereSource.GetOutputPort())
+            self.sphereActor.append(vtk.vtkActor())
+            self.sphereActor[i].SetMapper(self.sphereMapper[i])
+        
+        # Spheroid Source
+        self.spheroidMapper = list()
+        self.spheroidActor = list()
+        parametricFunctionSources = list()
+        for i in range(0, len(self.spheroids)):
+            parametricFunctionSources.append(vtk.vtkParametricFunctionSource())
+            parametricFunctionSources[i].SetParametricFunction(self.spheroids[i].spheroidSource)
+            #parametricFunctionSources[i].SetParametricFunction(self.spheroids[i].transFilter)
+            parametricFunctionSources[i].SetUResolution(51)
+            parametricFunctionSources[i].SetVResolution(51)
+            parametricFunctionSources[i].SetWResolution(51)
+            parametricFunctionSources[i].Update()
+            
+            # Transform to current position
+            aTransform = vtk.vtkTransform()
+            aTransform.Translate(self.spheroids[i].position[0], self.spheroids[i].position[1], self.spheroids[i].position[2])
+            transFilter = vtk.vtkTransformFilter()
+            transFilter.SetInputConnection(parametricFunctionSources[i].GetOutputPort())
+            transFilter.SetTransform(aTransform)
+            
+            self.spheroidMapper.append(vtk.vtkPolyDataMapper())
+            #self.spheroidMapper[i].SetInputConnection(parametricFunctionSources[i].GetOutputPort())
+            self.spheroidMapper[i].SetInputConnection(transFilter.GetOutputPort())
+            self.spheroidActor.append(vtk.vtkActor())
+            self.spheroidActor[i].SetMapper(self.spheroidMapper[i])
 
 
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
@@ -994,6 +1025,10 @@ class CreateVtkCuv(object):
             self.renderer.AddActor(s.edgeActor)
             self.renderer.AddActor(s.contActor)
             self.renderer.AddActor(s.glyphActor)
+            for i in range(0, len(s.sphereActor)):
+                self.renderer.AddActor(s.sphereActor[i])
+            for i in range(0, len(s.spheroidActor)):
+                self.renderer.AddActor(s.spheroidActor[i])
 
     def RemoveActors(self):
         for s in self.scenes:
@@ -1001,6 +1036,10 @@ class CreateVtkCuv(object):
             self.renderer.RemoveActor(s.edgeActor)
             self.renderer.RemoveActor(s.contActor)
             self.renderer.RemoveActor(s.glyphActor)
+            for i in range(0, len(s.sphereActor)):
+                self.renderer.RemoveActor(s.sphereActor)
+            for i in range(0, len(s.spheroidActor)):
+                self.renderer.RemoveActor(s.spheroidActor[i])
 
     def SetRenderWin(self):
 
