@@ -5,6 +5,7 @@ import sys
 import struct
 import time
 import re
+import ReadGLFile as r
 
 def tic():
     #Homemade version of matlab tic and toc functions
@@ -116,95 +117,6 @@ VSMOOTH = bytes.fromhex('01')
 
 VOFF = bytes.fromhex('00')
 VON = bytes.fromhex('01')
-
-def ReadFlags(fdata):
-    
-    flags = ReadTag(fdata)
-
-    fill = (flags[0] & SFILL[0]) != 0
-    out = (flags[0] & SOUTLINE[0]) != 0
-    trans = (flags[0] & STRANSPARENT[0]) != 0
-    multi = (flags[0] & SMULTICOLOR[0]) != 0
-
-    return fill, out, trans, multi
-
-
-def ReadText(fid):
-    pass
-
-
-def ReadTag(fdata):
-
-    tag = fdata.data[fdata.pos].tobytes()
-    fdata.pos = fdata.pos + 1
-
-    return tag
- 
- 
-def ReadFloats(fdata, dataType, n, bytesMirrored):
-    
-    if dataType == np.float32 and bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n).byteswap()
-        fdata.pos = fdata.pos + 4*n
-    elif dataType == np.float64 and bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*8)].tobytes(), dataType, n).byteswap()
-        fdata.pos = fdata.pos + 8*n
-    elif dataType == np.float32 and not bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n)
-        fdata.pos = fdata.pos + 4*n
-    elif dataType == np.float64 and not bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*8)].tobytes(), dataType, n)
-        fdata.pos = fdata.pos + 8*n
-
-    return fls
-    
-
-def ReadUint(fdata, dataType, n, bytesMirrored):
-    
-    if dataType == np.uint32 and bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n).byteswap()
-        fdata.pos = fdata.pos + 4*n
-    elif dataType == np.uint32 and not bytesMirrored:
-        fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n)
-        fdata.pos = fdata.pos + 4*n
-
-    return fls[0]
-
-
-def ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored):    
-    color = []
-    tr = []
-    
-    if multi:
-        x = n
-    else:
-        x = 1			 
-
-    for j in range (0, x):
-        if fill or out:
-            color.append(np.multiply(ReadFloats(fdata, np.float32, 3, bytesMirrored), 255.0))
-        else:
-            color.append(np.array([0.5, 0.5, 0.5]))
-        if trans:
-            tr.append(ReadFloats(fdata, np.float32, 1, bytesMirrored))
-        else:
-            tr.append(0.0)
-    '''
-    color = [np.array([0.5, 0.5, 0.5])]
-    tr = [0.0]
-
-    if fill or out:
-        color[0] = np.multiply(ReadFloats(fdata, np.float32, 3, bytesMirrored), 255.0)
-        if trans:
-            tr[0] = ReadFloats(fdata, np.float32, 1, bytesMirrored)
-
-        if multi:
-            for i in range(1, n):
-                color.append(np.multiply(ReadFloats(fdata, np.float32, 3, bytesMirrored), 255.0))
-                if trans:
-                    tr.append(ReadFloats(fdata, np.float32, 1, bytesMirrored))
-    '''
-    return color, tr
 
 
 class Poly(object):
@@ -379,8 +291,8 @@ class Scene(object):
         self.visible = True
 
     def AddVtkVector(self, fdata, bytesMirrored):
-        pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-        vec = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        pos = r.ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        vec = r.ReadFloats(fdata, np.float32, 3, bytesMirrored)
         vecMag = [math.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])]
 
         self.vecPoints.InsertNextPoint(pos)
@@ -391,12 +303,12 @@ class Scene(object):
         geo = []
         pid = []
 
-        fill, out, trans, multi = ReadFlags(fdata)
+        fill, out, trans, multi = r.ReadFlags(fdata)
 
         for i in range(0, n):            
-            geo.append(ReadFloats(fdata, np.float32, 3, bytesMirrored))
+            geo.append(r.ReadFloats(fdata, np.float32, 3, bytesMirrored))
 
-        color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
+        color, tr = r.ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
 
         for i in range(0, n):
             pid.append(self.points.InsertNextPoint(geo[i]))
@@ -440,12 +352,12 @@ class Scene(object):
         geo = []
         pid = []
 
-        fill, out, trans, multi = ReadFlags(fdata)
+        fill, out, trans, multi = r.ReadFlags(fdata)
 
         for i in range(0, n*no_of_points):
-            geo.append(ReadFloats(fdata, np.float32, 3, bytesMirrored))
+            geo.append(r.ReadFloats(fdata, np.float32, 3, bytesMirrored))
             pid.append(self.points.InsertNextPoint(geo[i]))
-            color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
+            color, tr = r.ReadColorAndTrans(fdata, fill, out, multi, trans, n, bytesMirrored)
             if multi:
                 t = [color[i][0]]
                 self.temps.InsertNextTypedTuple(t)
@@ -463,12 +375,12 @@ class Scene(object):
     def GetVtkPolys(self, fdata, n, no_of_lines, bytesMirrored):
         
         #Read flags
-        fill, out, trans, multi = ReadFlags(fdata)
+        fill, out, trans, multi = r.ReadFlags(fdata)
         pid = []
         for i in range(0, no_of_lines):
             #Read Points
             for j in range (0, n):
-                pid.append(self.points.InsertNextPoint(ReadFloats(fdata, np.float32, 3, bytesMirrored)))
+                pid.append(self.points.InsertNextPoint(r.ReadFloats(fdata, np.float32, 3, bytesMirrored)))
         
             #Read Colors
             color = []
@@ -481,11 +393,11 @@ class Scene(object):
     
             for j in range (0, x):
                 if fill or out:
-                    color.append(np.multiply(ReadFloats(fdata, np.float32, 3, bytesMirrored), 255.0))
+                    color.append(np.multiply(r.ReadFloats(fdata, np.float32, 3, bytesMirrored), 255.0))
                 else:
                     color.append(np.array([0.5, 0.5, 0.5]))
                 if trans:
-                    tr.append(ReadFloats(fdata, np.float32, 1, bytesMirrored))
+                    tr.append(r.ReadFloats(fdata, np.float32, 1, bytesMirrored))
                 else:
                     tr.append(0.0)
             
@@ -496,26 +408,26 @@ class Scene(object):
         return pid
 
     def GetVtkSphere(self, fdata, bytesMirrored):
-        fill, out, trans, multi = ReadFlags(fdata)
+        fill, out, trans, multi = r.ReadFlags(fdata)
         multi = False
 
-        pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-        rad = ReadFloats(fdata, np.float32, 1, bytesMirrored)
+        pos = r.ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        rad = r.ReadFloats(fdata, np.float32, 1, bytesMirrored)
 
-        color, tr = ReadColorAndTrans(fdata, fill,out,multi,trans,0, bytesMirrored)
+        color, tr = r.ReadColorAndTrans(fdata, fill,out,multi,trans,0, bytesMirrored)
 
         return Sphere(pos, rad, color, tr, fill, out)
 
     def GetVtkSpheroid(self, fdata, bytesMirrored):
-        fill, out, trans, multi = ReadFlags(fdata)
+        fill, out, trans, multi = r.ReadFlags(fdata)
         multi = False
 
-        pos = ReadFloats(fdata, np.float32, 3, bytesMirrored)
-        rad = ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        pos = r.ReadFloats(fdata, np.float32, 3, bytesMirrored)
+        rad = r.ReadFloats(fdata, np.float32, 3, bytesMirrored)
         #axis = ReadFloats(fdata, np.float32, 3, bytesMirrored)
         #rot = ReadFloats(fdata, np.float32, 1, bytesMirrored)
 
-        color, tr = ReadColorAndTrans(fdata, fill, out, multi, trans, 0, bytesMirrored)
+        color, tr = r.ReadColorAndTrans(fdata, fill, out, multi, trans, 0, bytesMirrored)
 
         #return Spheroid(pos, rad, axis, rot, color, tr, fill, out)
         return Spheroid(pos, rad, color, tr, fill, out)
@@ -524,18 +436,18 @@ class Scene(object):
 
         self.n = n
         
-        tag = ReadTag(fdata)
+        tag = r.ReadTag(fdata)
 
         if tag == BEGIN_SCENE_LABEL:
-            tag = ReadTag(fdata)
+            tag = r.ReadTag(fdata)
             label = bytes()
             while tag != END_SCENE_LABEL:
                 label = label + tag
-                tag = ReadTag(fdata)
+                tag = r.ReadTag(fdata)
 
             self.label = label.decode('ascii')
             self.number = int(re.search(r"\d+", self.label).group(0))
-            tag = ReadTag(fdata)
+            tag = r.ReadTag(fdata)
 
         if tag != END_SCENE:
             print('Reading Scene: \'{}\' {} ... '.format(self.label,n), end='');
@@ -559,7 +471,7 @@ class Scene(object):
 
             while tag != END_SCENE:
                 options[tag](fdata, bytesMirrored)
-                tag = ReadTag(fdata)
+                tag = r.ReadTag(fdata)
                 
             toc()
             self.vtkSurfPolyData.SetPoints(self.points)
@@ -580,7 +492,7 @@ class Scene(object):
             self.vtkContPolyData.GetPointData().SetScalars(self.temps)
             print('done. ', end='\n')
 
-        tag = ReadTag(fdata)
+        tag = r.ReadTag(fdata)
         return tag
         
     def InsertSPOINT(self, fdata, bytesMirrored):
@@ -637,7 +549,7 @@ class Scene(object):
         self.spheroids.append(self.GetVtkSpheroid(fdata, bytesMirrored))
 
     def InsertSTEXT(self, fdata, bytesMirrored):
-        self.texts.append(ReadText(fdata,bytesMirrored,'T'))
+        self.texts.append(r.ReadText(fdata,bytesMirrored,'T'))
         return
         
     def InsertSVECTOR(self, fdata, bytesMirrored):
@@ -953,7 +865,7 @@ class CreateVtkCuv(object):
 
     def ReadInitGLFile(self):
 
-        check = ReadUint(self.fdata, np.uint32, 1, False)
+        check = r.ReadUint(self.fdata, np.uint32, 1, False)
 
         if check == DATA_NORMAL_ORDER:
             self.bytesMirrored = False
@@ -962,16 +874,16 @@ class CreateVtkCuv(object):
         else:
             return False
 
-        if ReadTag(self.fdata) != BEGIN_DATA:
+        if r.ReadTag(self.fdata) != BEGIN_DATA:
             return False
 
-        if ReadTag(self.fdata) == BEGIN_VERSION:
-            tag = ReadTag(self.fdata)
+        if r.ReadTag(self.fdata) == BEGIN_VERSION:
+            tag = r.ReadTag(self.fdata)
             version = bytes()
 
             while tag != END_VERSION:
                 version = version + tag
-                tag = ReadTag(self.fdata)
+                tag = r.ReadTag(self.fdata)
 
             self.version = version.decode('ascii')
 
@@ -982,20 +894,20 @@ class CreateVtkCuv(object):
 
     def ReadEndGLFile(self):
 
-        if ReadTag(self.fdata) == VPRESET_VIEW:
-            self.view = ReadTag(self.fdata)
+        if r.ReadTag(self.fdata) == VPRESET_VIEW:
+            self.view = r.ReadTag(self.fdata)
 
-        while ReadTag(self.fdata) != END_VIEW: # ignore view settings for now
+        while r.ReadTag(self.fdata) != END_VIEW: # ignore view settings for now
             pass
 
-        if ReadTag(self.fdata) != END_DATA_STAY:
+        if r.ReadTag(self.fdata) != END_DATA_STAY:
             return False
 
         return True
 
     def ReadScenes(self):
 
-        tag = ReadTag(self.fdata)
+        tag = r.ReadTag(self.fdata)
         if tag != BEGIN_SCENE:
             return False
 

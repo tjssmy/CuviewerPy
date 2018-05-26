@@ -149,16 +149,16 @@ def main():
     write_points_scene(fid)
     
     # Write some lines in the GL file
-    #write_lines_scene(fid)
+    write_lines_scene(fid)
     
     # Write some triangles
-    #write_triangles_scene(fid)
+    write_triangles_scene(fid)
     
     # Write some quads
-    #write_quads_scene(fid)
+    write_quads_scene(fid)
     
     # Write some spheres
-    #write_spheres_scene(fid)
+    write_spheres_scene(fid)
     
     # Write some spheroids
     write_spheroid_scene(fid)
