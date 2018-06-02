@@ -4,10 +4,10 @@ The methods here can be used to read the various tags/flags/data from the GL fil
 '''
 
 import numpy as np
-import cuviewer as c
+import Constants as c
+
 
 def ReadFlags(fdata):
-    
     flags = ReadTag(fdata)
 
     fill = (flags[0] & c.SFILL[0]) != 0
@@ -18,12 +18,11 @@ def ReadFlags(fdata):
     return fill, out, trans, multi
 
 
-def ReadText(fid):
+def ReadText(fdata,bytesMirrored,text ='T'):
     pass
 
 
 def ReadTag(fdata):
-
     tag = fdata.data[fdata.pos].tobytes()
     fdata.pos = fdata.pos + 1
 
@@ -31,7 +30,6 @@ def ReadTag(fdata):
  
  
 def ReadFloats(fdata, dataType, n, bytesMirrored):
-    
     if dataType == np.float32 and bytesMirrored:
         fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n).byteswap()
         fdata.pos = fdata.pos + 4*n
@@ -49,7 +47,6 @@ def ReadFloats(fdata, dataType, n, bytesMirrored):
     
 
 def ReadUint(fdata, dataType, n, bytesMirrored):
-    
     if dataType == np.uint32 and bytesMirrored:
         fls = np.frombuffer(fdata.data[fdata.pos : fdata.pos+(n*4)].tobytes(), dataType, n).byteswap()
         fdata.pos = fdata.pos + 4*n

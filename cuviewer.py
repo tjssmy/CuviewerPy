@@ -2,16 +2,17 @@ import numpy as np
 import vtk
 import math
 import sys
-import struct
-import time
 import re
 import ReadGLFile as r
+import Constants as c
+
 
 def tic():
-    #Homemade version of matlab tic and toc functions
+    # Homemade version of matlab tic and toc functions
     import time
     global startTime_for_tictoc
     startTime_for_tictoc = time.time()
+
 
 def toc():
     import time
@@ -19,104 +20,6 @@ def toc():
         print("Elapsed time is {0:8f} seconds.".format(float(str(time.time() - startTime_for_tictoc))))
     else:
         print("Toc: start time not set")
-
-# These are the tags used by the Carleton University 3D Viewer 2.0. */ 
-
-# for bit/byte order
-DATA_ORDER_CHECK = 1351861536
-DATA_NORMAL_ORDER = 1351861536
-DATA_MIRROR_ORDER = 549819216
-
-# for version checking
-VERSION_STRING = "Carleton University 3D Viewer 2.0 - python"
-SHORT_VERSION_STRING = "Carleton University 3D Viewer "
-BEGIN_SCENE_LABEL = bytes.fromhex('D1')
-END_SCENE_LABEL = bytes.fromhex('D2')
-
-# tags for the sections
-BEGIN_DATA = bytes.fromhex('C0')
-BEGIN_VERSION = bytes.fromhex('C4')
-BEGIN_IMG_SET = bytes.fromhex('C5')
-BEGIN_MOV_SET = bytes.fromhex('C6')
-BEGIN_SCENE = bytes.fromhex('C8')
-USER_INTERACT = bytes.fromhex('C9')
-BEGIN_VIEW = bytes.fromhex('CC')
-RESET_VIEW = bytes.fromhex('CD')
-GRAB_IMAGE = bytes.fromhex('CE')
-GRAB_FRAME = bytes.fromhex('CF')
-
-END_DATA_STAY = bytes.fromhex('A0')
-END_DATA_EXIT = bytes.fromhex('A1')
-END_VERSION = bytes.fromhex('A4')
-END_IMG_SET = bytes.fromhex('A5')
-END_MOV_SET = bytes.fromhex('A6')
-END_SCENE = bytes.fromhex('A8')
-END_VIEW = bytes.fromhex('AC')
-
-# tags while in the scene section
-SPOINT = bytes.fromhex('00')
-MULTIPLE_SPOINT = bytes.fromhex('08')
-SLINE = bytes.fromhex('01')
-MULTIPLE_SLINE = bytes.fromhex('09')
-STRIA = bytes.fromhex('02')
-MULTIPLE_STRIA = bytes.fromhex('10')
-SQUADRI = bytes.fromhex('03')
-MULTIPLE_SQUADRI = bytes.fromhex('11')
-SSPHERE = bytes.fromhex('04')
-SSPHOID = bytes.fromhex('05')
-STEXT = bytes.fromhex('06')
-SVECTOR = bytes.fromhex('07')
-
-# shape properties in the scene section
-SFILL = bytes.fromhex('01')
-SOUTLINE = bytes.fromhex('02')
-SMULTICOLOR = bytes.fromhex('04')
-STRANSPARENT = bytes.fromhex('08')
-SNORMALS = bytes.fromhex('10')
-SMATERIAL = bytes.fromhex('20')
-SUNDEFINED = bytes.fromhex('40')
-SPROCESSED = bytes.fromhex('80')
-
-# tags while in the view section
-VCAM_TRANS = bytes.fromhex('00')
-VCAM_ROTATE = bytes.fromhex('01')
-VCAM_ORBIT = bytes.fromhex('02')
-VOUTLINE_CLR = bytes.fromhex('03')
-VPRESET_VIEW = bytes.fromhex('04')
-
-VVIEW_MODE = bytes.fromhex('10')
-VFOV = bytes.fromhex('11')
-VCLIP_PLANE = bytes.fromhex('12')
-VLINE_WIDTH = bytes.fromhex('13')
-VSHADING = bytes.fromhex('14')
-VBIN_PAL_SEL = bytes.fromhex('15')
-VBIN_PAL_MAP = bytes.fromhex('16')
-
-VLIGHTING = bytes.fromhex('20')
-VLIGHT = bytes.fromhex('21')
-VAMB_LIGHT = bytes.fromhex('22')
-VDIFF_LIGHT = bytes.fromhex('23')
-VBG_LIGHT = bytes.fromhex('24')
-VGAMMA = bytes.fromhex('25')
-
-VWIREFRAME = bytes.fromhex('30')
-VOUTLINES = bytes.fromhex('31')
-VTWO_SIDED = bytes.fromhex('32')
-VTRANSPARENT = bytes.fromhex('33')
-VBIN_PAL = bytes.fromhex('34')
-VANTIALIAS = bytes.fromhex('35')
-
-VRELATIVE = bytes.fromhex('00')
-VABSOLUTE = bytes.fromhex('01')
-
-VORHTO = bytes.fromhex('00')
-VPERSPECTIVE = bytes.fromhex('01')
-
-VFLAT = bytes.fromhex('00')
-VSMOOTH = bytes.fromhex('01')
-
-VOFF = bytes.fromhex('00')
-VON = bytes.fromhex('01')
 
 
 class Poly(object):
@@ -170,7 +73,6 @@ class Poly(object):
 class Sphere(object):
 
     def __init__(self, pos, rad, color, tr, fill, out):
-		
         self.sphereSource = vtk.vtkSphereSource()
         self.sphereSource.SetCenter(pos[0], pos[1], pos[2])
         self.sphereSource.SetRadius(rad[0])
@@ -180,9 +82,9 @@ class Sphere(object):
 
 
 class Spheroid(object):
-	
+
     def __init__(self, pos, rad, color, tr, fill, out):
-    #def __init__(self, pos, rad, axis, rot, color, tr, fill, out):
+    # def __init__(self, pos, rad, axis, rot, color, tr, fill, out):
         self.spheroidSource = vtk.vtkParametricEllipsoid()
         self.spheroidSource.SetXRadius(rad[0])
         self.spheroidSource.SetYRadius(rad[1])
@@ -438,10 +340,10 @@ class Scene(object):
         
         tag = r.ReadTag(fdata)
 
-        if tag == BEGIN_SCENE_LABEL:
+        if tag == c.BEGIN_SCENE_LABEL:
             tag = r.ReadTag(fdata)
             label = bytes()
-            while tag != END_SCENE_LABEL:
+            while tag != c.END_SCENE_LABEL:
                 label = label + tag
                 tag = r.ReadTag(fdata)
 
@@ -449,27 +351,27 @@ class Scene(object):
             self.number = int(re.search(r"\d+", self.label).group(0))
             tag = r.ReadTag(fdata)
 
-        if tag != END_SCENE:
+        if tag != c.END_SCENE:
             print('Reading Scene: \'{}\' {} ... '.format(self.label,n), end='');
             sys.stdout.flush()
             tic()
             
             options = {
-                SPOINT:           lambda fdata, bytesMirrored: self.InsertSPOINT(fdata, bytesMirrored),
-                MULTIPLE_SPOINT:  lambda fdata, bytesMirrored: self.InsertMULTIPLESPOINT(fdata, bytesMirrored),
-                SLINE:            lambda fdata, bytesMirrored: self.InsertSLINE(fdata, bytesMirrored),
-                MULTIPLE_SLINE:   lambda fdata, bytesMirrored: self.InsertMULTIPLESLINE(fdata, bytesMirrored),
-                STRIA:            lambda fdata, bytesMirrored: self.InsertSTRIA(fdata, bytesMirrored),
-                MULTIPLE_STRIA:   lambda fdata, bytesMirrored: self.InsertMULTIPLESTRIA(fdata, bytesMirrored),
-                SQUADRI:          lambda fdata, bytesMirrored: self.InsertSQUADRI(fdata, bytesMirrored),
-                MULTIPLE_SQUADRI: lambda fdata, bytesMirrored: self.InsertMULTIPLESQUADRI(fdata, bytesMirrored),
-                SSPHERE:          lambda fdata, bytesMirrored: self.InsertSSPHERE(fdata, bytesMirrored),
-                SSPHOID:          lambda fdata, bytesMirrored: self.InsertSSPHOID(fdata, bytesMirrored),
-                STEXT:            lambda fdata, bytesMirrored: self.InsertSTEXT(fdata, bytesMirrored),
-                SVECTOR:          lambda fdata, bytesMirrored: self.InsertSVECTOR(fdata, bytesMirrored)
+                c.SPOINT:           lambda fdata, bytesMirrored: self.InsertSPOINT(fdata, bytesMirrored),
+                c.MULTIPLE_SPOINT:  lambda fdata, bytesMirrored: self.InsertMULTIPLESPOINT(fdata, bytesMirrored),
+                c.SLINE:            lambda fdata, bytesMirrored: self.InsertSLINE(fdata, bytesMirrored),
+                c.MULTIPLE_SLINE:   lambda fdata, bytesMirrored: self.InsertMULTIPLESLINE(fdata, bytesMirrored),
+                c.STRIA:            lambda fdata, bytesMirrored: self.InsertSTRIA(fdata, bytesMirrored),
+                c.MULTIPLE_STRIA:   lambda fdata, bytesMirrored: self.InsertMULTIPLESTRIA(fdata, bytesMirrored),
+                c.SQUADRI:          lambda fdata, bytesMirrored: self.InsertSQUADRI(fdata, bytesMirrored),
+                c.MULTIPLE_SQUADRI: lambda fdata, bytesMirrored: self.InsertMULTIPLESQUADRI(fdata, bytesMirrored),
+                c.SSPHERE:          lambda fdata, bytesMirrored: self.InsertSSPHERE(fdata, bytesMirrored),
+                c.SSPHOID:          lambda fdata, bytesMirrored: self.InsertSSPHOID(fdata, bytesMirrored),
+                c.STEXT:            lambda fdata, bytesMirrored: self.InsertSTEXT(fdata, bytesMirrored),
+                c.SVECTOR:          lambda fdata, bytesMirrored: self.InsertSVECTOR(fdata, bytesMirrored)
             }
 
-            while tag != END_SCENE:
+            while tag != c.END_SCENE:
                 options[tag](fdata, bytesMirrored)
                 tag = r.ReadTag(fdata)
                 
@@ -675,7 +577,6 @@ class Scene(object):
         for i in range(0, len(self.spheroids)):
             parametricFunctionSources.append(vtk.vtkParametricFunctionSource())
             parametricFunctionSources[i].SetParametricFunction(self.spheroids[i].spheroidSource)
-            #parametricFunctionSources[i].SetParametricFunction(self.spheroids[i].transFilter)
             parametricFunctionSources[i].SetUResolution(51)
             parametricFunctionSources[i].SetVResolution(51)
             parametricFunctionSources[i].SetWResolution(51)
@@ -689,7 +590,6 @@ class Scene(object):
             transFilter.SetTransform(aTransform)
             
             self.spheroidMapper.append(vtk.vtkPolyDataMapper())
-            #self.spheroidMapper[i].SetInputConnection(parametricFunctionSources[i].GetOutputPort())
             self.spheroidMapper[i].SetInputConnection(transFilter.GetOutputPort())
             self.spheroidActor.append(vtk.vtkActor())
             self.spheroidActor[i].SetMapper(self.spheroidMapper[i])
@@ -813,23 +713,18 @@ class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
         self.OnKeyPress()
 
 
-class cuvFileData(object):
-
+class CuvFileData(object):
     def __init__(self,file):
         self.pos = 0
 
         try:
             self.data = np.fromfile(file, 'int8')
-            #fid = open(file, 'rb')
-            #self.data = fid.read()
-            #fid.close()
         except IOError:
             print("Could not read file: {}".format(file))
             exit()
 
 
 class CreateVtkCuv(object):
-
     def __init__(self):
         self.version = ''
         self.err = 0
@@ -843,13 +738,12 @@ class CreateVtkCuv(object):
         self.Lighting = True
 
     def ReadCuvFile(self, file=None):
-
         print('Reading file ... ')
 
         if file is not None:
             self.file = file
 
-        self.fdata = cuvFileData(self.file)
+        self.fdata = CuvFileData(self.file)
         self.fid = 0
 
         if not self.ReadInitGLFile():
@@ -864,24 +758,23 @@ class CreateVtkCuv(object):
         print('Done')
 
     def ReadInitGLFile(self):
-
         check = r.ReadUint(self.fdata, np.uint32, 1, False)
 
-        if check == DATA_NORMAL_ORDER:
+        if check == c.DATA_NORMAL_ORDER:
             self.bytesMirrored = False
-        elif check == DATA_MIRROR_ORDER:
+        elif check == c.DATA_MIRROR_ORDER:
             self.bytesMirrored = True
         else:
             return False
 
-        if r.ReadTag(self.fdata) != BEGIN_DATA:
+        if r.ReadTag(self.fdata) != c.BEGIN_DATA:
             return False
 
-        if r.ReadTag(self.fdata) == BEGIN_VERSION:
+        if r.ReadTag(self.fdata) == c.BEGIN_VERSION:
             tag = r.ReadTag(self.fdata)
             version = bytes()
 
-            while tag != END_VERSION:
+            while tag != c.END_VERSION:
                 version = version + tag
                 tag = r.ReadTag(self.fdata)
 
@@ -893,27 +786,25 @@ class CreateVtkCuv(object):
         return True
 
     def ReadEndGLFile(self):
-
-        if r.ReadTag(self.fdata) == VPRESET_VIEW:
+        if r.ReadTag(self.fdata) == c.VPRESET_VIEW:
             self.view = r.ReadTag(self.fdata)
 
-        while r.ReadTag(self.fdata) != END_VIEW: # ignore view settings for now
+        while r.ReadTag(self.fdata) != c.END_VIEW: # ignore view settings for now
             pass
 
-        if r.ReadTag(self.fdata) != END_DATA_STAY:
+        if r.ReadTag(self.fdata) != c.END_DATA_STAY:
             return False
 
         return True
 
     def ReadScenes(self):
-
         tag = r.ReadTag(self.fdata)
-        if tag != BEGIN_SCENE:
+        if tag != c.BEGIN_SCENE:
             return False
 
         nScene = 1
         self.scenes = []
-        while tag == BEGIN_SCENE:
+        while tag == c.BEGIN_SCENE:
 
             scene = Scene()
             self.scenes.append(scene)
@@ -921,13 +812,12 @@ class CreateVtkCuv(object):
             nScene = nScene + 1
             print('Read scenes and visualize')
 
-        if tag != BEGIN_VIEW:
+        if tag != c.BEGIN_VIEW:
             return False
         else:
             return True
 
     def CreateSceneMappersAndActors(self):
-
         for s in self.scenes:
             s.CreateVtkMapperActor()
 
@@ -954,7 +844,6 @@ class CreateVtkCuv(object):
                 self.renderer.RemoveActor(s.spheroidActor[i])
 
     def SetRenderWin(self):
-
         self.CreateSceneMappersAndActors()
 
         self.renderer = vtk.vtkRenderer()
@@ -981,7 +870,6 @@ class CreateVtkCuv(object):
         self.SetView('v')
 
     def SetView(self,view):
-
         npos = self.camera.GetPosition()
         foc = self.camera.GetFocalPoint()
         nview = self.camera.GetViewUp()
@@ -1019,7 +907,6 @@ class CreateVtkCuv(object):
         self.ReDraw()
 
     def ReReadFile(self):
-        
         self.RemoveActors()
         self.ReadCuvFile()
         self.CreateSceneMappersAndActors()
@@ -1027,12 +914,10 @@ class CreateVtkCuv(object):
         self.ReDraw()
 
     def ResetArrowGlyphScale(self,sc):
-
         for s in self.scenes:
             s.ResetArrowGlyphScale(sc)
 
     def ReDraw(self):
-
         for s in self.scenes:
 
             if not s.visible:
@@ -1089,7 +974,6 @@ class CreateVtkCuv(object):
             self.camera.ParallelProjectionOn()
 
     def SceneToggleVis(self, n0, n1):
-
         if n1 == -1:
             n1 = n0
 
@@ -1150,4 +1034,3 @@ class CreateVtkCuv(object):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
-

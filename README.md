@@ -29,6 +29,8 @@ python3 CuViewerPy.py
 	1) Lines
 	2) Triangles
 	3) Quadrilaterals
+	4) Spheres
+	5) Spheroids
 	
 ### Window interactions:
 
