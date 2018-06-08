@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3
+
 import numpy as np
 import vtk
 import math
@@ -5,6 +7,12 @@ import sys
 import re
 import ReadGLFile as r
 import Constants as c
+import display
+
+from PyQt4 import QtCore, QtGui
+from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+#from PyQt4.QtCore import QThread
+#from PyQt4.QtCore import QObject, pyqtSignal, pyqtSlot
 
 
 def tic():
@@ -846,28 +854,31 @@ class CreateVtkCuv(object):
     def SetRenderWin(self):
         self.CreateSceneMappersAndActors()
 
-        self.renderer = vtk.vtkRenderer()
-        self.renderWindow = vtk.vtkRenderWindow()
-        self.renderWindow.AddRenderer(self.renderer)
+        self.window = MainWindow(self.scenes)
 
-        WIDTH = 940
-        HEIGHT = 680
-        self.renderWindow.SetSize(WIDTH, HEIGHT)
+        #self.renderer = vtk.vtkRenderer()
+        #self.renderWindow = vtk.vtkRenderWindow()
+        #self.renderWindow.AddRenderer(self.renderer)
 
-        self.renderWindowInteractor = vtk.vtkRenderWindowInteractor()
-        self.renderWindowInteractor.SetRenderWindow(self.renderWindow)
-        self.renderer.SetBackground(.9, .9, .9)
+        #WIDTH = 940
+        #HEIGHT = 680
+        #self.renderWindow.SetSize(WIDTH, HEIGHT)
 
-        self.AddActors()
+        #self.renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+        #self.renderWindowInteractor.SetRenderWindow(self.renderWindow)
+        #self.renderer.SetBackground(.9, .9, .9)
 
-        style = StructureInteractorStyle(self)
-        self.renderWindowInteractor.SetInteractorStyle(style)
+        #self.AddActors()
 
-        self.PrintSceneInfo()
 
-        self.camera = self.renderer.GetActiveCamera()
-        self.renderer.ResetCamera()
-        self.SetView('v')
+        #style = StructureInteractorStyle(self)
+        #self.renderWindowInteractor.SetInteractorStyle(style)
+
+        #self.PrintSceneInfo()
+
+        #self.camera = self.renderer.GetActiveCamera()
+        #self.renderer.ResetCamera()
+        #self.SetView('v')
 
     def SetView(self,view):
         npos = self.camera.GetPosition()
@@ -1034,3 +1045,164 @@ class CreateVtkCuv(object):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
+
+
+class MainWindow(QtGui.QMainWindow, display.Ui_MainWindow):
+
+    def __init__(self, scenes):
+        ##
+        self.version = ''
+        self.err = 0
+        self.scenes = []
+        self.view = bytes.fromhex('00')
+        self.bytesMirrored = False
+        self.SurfDraw = True
+        self.EdgeDraw = False
+        self.ContDraw = False
+        self.VectDraw = True
+        self.Lighting = True
+        ##
+        super(self.__class__, self).__init__()
+        self.setupUi(self)
+
+        self.scenes = scenes
+
+        self.vl = QtGui.QVBoxLayout()
+        self.vtkWidget = QVTKRenderWindowInteractor(self.frame)
+        self.vl.addWidget(self.vtkWidget)
+        self.frame.setLayout(self.vl)
+
+        self.renderer = vtk.vtkRenderer()
+        self.renderWindowInteractor = vtk.vtkRenderWindowInteractor()
+        self.renderer.SetBackground(.9, .9, .9)
+
+        self.AddActors()
+
+        style = StructureInteractorStyle(self)
+        self.renderWindowInteractor.SetInteractorStyle(style)
+
+        self.PrintSceneInfo()
+
+
+        self.vtkWidget.GetRenderWindow().AddRenderer(self.renderer)
+        self.vtkWidget.GetRenderWindow().Render()
+        self.vtkWidget.Initialize()
+
+
+        self.camera = self.renderer.GetActiveCamera()
+        self.renderer.ResetCamera()
+        self.SetView('v')
+
+
+    def CreateSceneMappersAndActors(self, scenes):
+        for s in scenes:
+            s.CreateVtkMapperActor()
+
+    def AddActors(self):
+        for s in self.scenes:
+            self.renderer.AddActor(s.surfActor)
+            self.renderer.AddActor(s.edgeActor)
+            self.renderer.AddActor(s.contActor)
+            self.renderer.AddActor(s.glyphActor)
+            for i in range(0, len(s.sphereActor)):
+                self.renderer.AddActor(s.sphereActor[i])
+            for i in range(0, len(s.spheroidActor)):
+                self.renderer.AddActor(s.spheroidActor[i])
+
+    def PrintSceneInfo(self):
+        print('\nScenes: ')
+
+        for s in self.scenes:
+
+            print ('\t {:>3} \t{:>40} \tVis: {} [e {} s {} c {} v {}] Entities: Lines {} Polys {:>6} vecs {}'.format(
+                s.n, s.label, s.visible, s.edgeActor.GetVisibility(),
+                s.surfActor.GetVisibility(),
+                s.contActor.GetVisibility(),
+                s.glyphActor.GetVisibility(),
+                s.vtkSurfPolyData.GetNumberOfLines(),
+                s.vtkSurfPolyData.GetNumberOfPolys(),
+                s.vtkVectPolyData.GetNumberOfVerts()))
+
+    def SetView(self,view):
+        npos = self.camera.GetPosition()
+        foc = self.camera.GetFocalPoint()
+        nview = self.camera.GetViewUp()
+
+        if view == 'r':
+            npos = (foc[0]-1, foc[1], foc[2])
+            nview = (0, 0, 1)
+        elif view == 'l':
+            npos = (foc[0]+1, foc[1], foc[2])
+            nview = (0, 0, 1)
+        elif view == 'f':
+            npos = (foc[0], foc[1]-1, foc[2])
+            nview = (0, 0, 1)
+        elif view == 'b':
+            npos = (foc[0], foc[1]+1, foc[2])
+            nview = (0, 0, 1)
+        elif view == 'u':
+            npos = (foc[0], foc[1], foc[2]-1.0)
+            nview = (0, -1, 0)
+        elif view == 'd':
+            npos = (foc[0], foc[1], foc[2] + 1.0)
+            nview = (0, 1, 0)
+        elif view == 'v':
+            npos = (foc[0]+1, foc[1]-1, foc[2] + 1.0)
+            nview = (0, 0, 1)
+
+        self.camera.OrthogonalizeViewUp()
+        if view in 'rlfbud':
+            self.camera.ParallelProjectionOn()
+
+        self.camera.SetPosition(npos)
+        self.camera.SetViewUp(nview)
+        self.renderer.ResetCamera()
+
+        self.ReDraw()
+
+    def ReDraw(self):
+        for s in self.scenes:
+
+            if not s.visible:
+                s.surfActor.VisibilityOff()
+                s.contActor.VisibilityOff()
+                s.edgeActor.VisibilityOff()
+                s.glyphActor.VisibilityOff()
+            else:
+
+                if self.SurfDraw:
+                    s.surfActor.VisibilityOn()
+                    s.contActor.VisibilityOff()
+                else:
+                    s.surfActor.VisibilityOff()
+                    s.contActor.VisibilityOn()
+
+                if self.ContDraw:
+                    s.surfActor.VisibilityOff()
+                    s.contActor.VisibilityOn()
+                else:
+                    s.surfActor.VisibilityOn()
+                    s.contActor.VisibilityOff()
+
+                if self.EdgeDraw:
+                    s.edgeActor.VisibilityOn()
+                else:
+                    s.edgeActor.VisibilityOff()
+
+                if self.VectDraw:
+                    s.glyphActor.VisibilityOn()
+                else:
+                    s.glyphActor.VisibilityOff()
+
+                if self.Lighting:
+                    s.surfActor.GetProperty().LightingOn()
+                    s.contActor.GetProperty().LightingOn()
+                    s.glyphActor.GetProperty().LightingOn()
+                else:
+                    s.surfActor.GetProperty().LightingOff()
+                    s.contActor.GetProperty().LightingOff()
+                    s.glyphActor.GetProperty().LightingOff()
+
+        #self.renderWindow.Render()
+        self.vtkWidget.GetRenderWindow().Render()
+        # self.PrintSceneInfo()

@@ -10,57 +10,55 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="CuViewer.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/CuViewer.py">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="CuViewerPy.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CuViewerPy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="243">
-              <caret line="740" column="34" lean-forward="true" selection-start-line="740" selection-start-column="34" selection-end-line="740" selection-end-column="34" />
+            <state relative-caret-position="255">
+              <caret line="15" column="5" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#128#264#0" />
-                <element signature="e#281#491#0" />
-                <element signature="e#3313#4639#0" />
-                <element signature="e#4669#5010#0" />
-                <element signature="e#5043#5398#0" />
-                <element signature="e#5426#5560#0" />
-                <element signature="e#5617#6367#0" />
-                <element signature="e#6389#7275#0" />
-                <element signature="e#7304#24824#0" />
-                <element signature="e#24903#28471#0" />
+                <element signature="e#26#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CreateTestFileOld.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CreateTestFileOld.py">
+      <file leaf-file-name="cuviewer.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/cuviewer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+            <state relative-caret-position="460">
+              <caret line="1095" column="43" selection-start-line="1095" selection-start-column="43" selection-end-line="1095" selection-end-column="43" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReadGLFile.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ReadGLFile.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WriteGLFile.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/WriteGLFile.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-              <folding>
-                <element signature="e#163#181#0" expanded="true" />
+                <element signature="e#26#44#0" expanded="true" />
+                <element signature="e#125#262#0" />
+                <element signature="e#280#490#0" />
+                <element signature="e#518#1844#0" />
+                <element signature="e#1874#2212#0" />
+                <element signature="e#2244#2600#0" />
+                <element signature="e#2628#2762#0" />
+                <element signature="e#2819#3569#0" />
+                <element signature="e#3591#4477#0" />
+                <element signature="e#4506#21862#0" />
+                <element signature="e#25543#25753#0" />
+                <element signature="e#26149#26510#0" />
+                <element signature="e#26550#27240#0" />
+                <element signature="e#27279#27568#0" />
+                <element signature="e#27604#28086#0" />
+                <element signature="e#28139#28197#0" />
+                <element signature="e#28232#28666#0" />
+                <element signature="e#28704#29153#0" />
+                <element signature="e#29974#31070#0" />
+                <element signature="e#31106#31242#0" />
+                <element signature="e#31291#31351#0" />
+                <element signature="e#31383#32914#0" />
+                <element signature="e#32952#33001#0" />
+                <element signature="e#33038#33186#0" />
+                <element signature="e#33234#33798#0" />
+                <element signature="e#33838#34376#0" />
+                <element signature="e#34410#35401#0" />
+                <element signature="e#36233#36291#0" />
+                <element signature="e#36581#37015#0" />
+                <element signature="e#37154#37692#0" />
               </folding>
             </state>
           </provider>
@@ -69,28 +67,11 @@
       <file leaf-file-name="CreateTestFileNew.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CreateTestFileNew.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="113" column="24" selection-start-line="113" selection-start-column="24" selection-end-line="113" selection-end-column="24" />
+            <state relative-caret-position="17">
+              <caret line="1" selection-start-line="1" selection-end-line="1" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
-                <element signature="e#108#478#0" />
-                <element signature="e#518#1221#0" />
-                <element signature="e#1260#2197#0" />
-                <element signature="e#2232#3252#0" />
-                <element signature="e#3289#3575#0" />
-                <element signature="e#3613#3942#0" />
-                <element signature="e#3977#4166#0" />
-                <element signature="e#4185#4784#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Constants.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Constants.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="969">
-              <caret line="57" column="3" selection-start-line="57" selection-start-column="3" selection-end-line="57" selection-end-column="3" />
             </state>
           </provider>
         </entry>
@@ -98,8 +79,8 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="32" column="16" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
+            <state relative-caret-position="544">
+              <caret line="34" column="16" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -118,6 +99,9 @@
       <find>c.</find>
       <find>cuviewer</find>
       <find>cuvFileData</find>
+      <find>StructureInteractorStyle</find>
+      <find>surfdraw</find>
+      <find>vtkRenderWindowInteractor</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -132,18 +116,19 @@
         <option value="$PROJECT_DIR$/Constants.py" />
         <option value="$PROJECT_DIR$/ReadGLFile.py" />
         <option value="$PROJECT_DIR$/WriteGLFile.py" />
-        <option value="$PROJECT_DIR$/cuviewer.py" />
-        <option value="$PROJECT_DIR$/CreateTestFileNew.py" />
         <option value="$PROJECT_DIR$/CreateTestFileOld.py" />
         <option value="$PROJECT_DIR$/CuViewer.py" />
+        <option value="$PROJECT_DIR$/CreateTestFileNew.py" />
+        <option value="$PROJECT_DIR$/CuViewerPy.py" />
+        <option value="$PROJECT_DIR$/cuviewer.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="260" />
-    <option name="y" value="80" />
-    <option name="width" value="1400" />
-    <option name="height" value="1000" />
+    <option name="x" value="726" />
+    <option name="y" value="-8" />
+    <option name="width" value="933" />
+    <option name="height" value="946" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -194,26 +179,26 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18020834" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12223393" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -221,24 +206,61 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/CreateTestFile.py">
+    <entry file="file://$PROJECT_DIR$/cuviewer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="72" column="22" lean-forward="true" selection-start-line="72" selection-start-column="22" selection-end-line="72" selection-end-column="22" />
+        <state relative-caret-position="12580">
+          <caret line="740" column="31" lean-forward="true" selection-start-line="740" selection-start-column="31" selection-end-line="740" selection-end-column="31" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#26#44#0" expanded="true" />
+            <element signature="e#125#262#0" />
+            <element signature="e#280#490#0" />
+            <element signature="e#518#1844#0" />
+            <element signature="e#1874#2212#0" />
+            <element signature="e#2244#2600#0" />
+            <element signature="e#2628#2762#0" />
+            <element signature="e#2819#3569#0" />
+            <element signature="e#3591#4477#0" />
+            <element signature="e#4506#21862#0" />
+            <element signature="e#25543#25753#0" />
+            <element signature="e#26149#26510#0" />
+            <element signature="e#26550#27240#0" />
+            <element signature="e#27279#27568#0" />
+            <element signature="e#27604#28086#0" />
+            <element signature="e#28139#28197#0" />
+            <element signature="e#28232#28666#0" />
+            <element signature="e#28704#29153#0" />
+            <element signature="e#29974#31070#0" />
+            <element signature="e#31106#31242#0" />
+            <element signature="e#31291#31351#0" />
+            <element signature="e#31383#32914#0" />
+            <element signature="e#32952#33001#0" />
+            <element signature="e#33038#33186#0" />
+            <element signature="e#33234#33798#0" />
+            <element signature="e#33838#34376#0" />
+            <element signature="e#34410#35401#0" />
+            <element signature="e#36233#36291#0" />
+            <element signature="e#36581#37015#0" />
+            <element signature="e#37154#37692#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
+        <state relative-caret-position="544">
           <caret line="32" column="16" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CreateTestFile.py" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="34" column="16" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -246,9 +268,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-          <folding>
-            <element signature="e#163#181#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -256,24 +275,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CreateTestFileNew.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="113" column="24" selection-start-line="113" selection-start-column="24" selection-end-line="113" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-            <element signature="e#108#478#0" />
-            <element signature="e#518#1221#0" />
-            <element signature="e#1260#2197#0" />
-            <element signature="e#2232#3252#0" />
-            <element signature="e#3289#3575#0" />
-            <element signature="e#3613#3942#0" />
-            <element signature="e#3977#4166#0" />
-            <element signature="e#4185#4784#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -288,28 +289,64 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
           <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CreateTestFileNew.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CuViewer.py">
+    <entry file="file://$PROJECT_DIR$/CuViewerPy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="740" column="34" lean-forward="true" selection-start-line="740" selection-start-column="34" selection-end-line="740" selection-end-column="34" />
+        <state relative-caret-position="255">
+          <caret line="15" column="5" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#128#264#0" />
-            <element signature="e#281#491#0" />
-            <element signature="e#3313#4639#0" />
-            <element signature="e#4669#5010#0" />
-            <element signature="e#5043#5398#0" />
-            <element signature="e#5426#5560#0" />
-            <element signature="e#5617#6367#0" />
-            <element signature="e#6389#7275#0" />
-            <element signature="e#7304#24824#0" />
-            <element signature="e#24903#28471#0" />
+            <element signature="e#26#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cuviewer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="1095" column="43" selection-start-line="1095" selection-start-column="43" selection-end-line="1095" selection-end-column="43" />
+          <folding>
+            <element signature="e#26#44#0" expanded="true" />
+            <element signature="e#125#262#0" />
+            <element signature="e#280#490#0" />
+            <element signature="e#518#1844#0" />
+            <element signature="e#1874#2212#0" />
+            <element signature="e#2244#2600#0" />
+            <element signature="e#2628#2762#0" />
+            <element signature="e#2819#3569#0" />
+            <element signature="e#3591#4477#0" />
+            <element signature="e#4506#21862#0" />
+            <element signature="e#25543#25753#0" />
+            <element signature="e#26149#26510#0" />
+            <element signature="e#26550#27240#0" />
+            <element signature="e#27279#27568#0" />
+            <element signature="e#27604#28086#0" />
+            <element signature="e#28139#28197#0" />
+            <element signature="e#28232#28666#0" />
+            <element signature="e#28704#29153#0" />
+            <element signature="e#29974#31070#0" />
+            <element signature="e#31106#31242#0" />
+            <element signature="e#31291#31351#0" />
+            <element signature="e#31383#32914#0" />
+            <element signature="e#32952#33001#0" />
+            <element signature="e#33038#33186#0" />
+            <element signature="e#33234#33798#0" />
+            <element signature="e#33838#34376#0" />
+            <element signature="e#34410#35401#0" />
+            <element signature="e#36233#36291#0" />
+            <element signature="e#36581#37015#0" />
+            <element signature="e#37154#37692#0" />
           </folding>
         </state>
       </provider>

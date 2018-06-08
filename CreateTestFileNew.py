@@ -1,6 +1,8 @@
+#!/usr/local/bin/python3
+
 import Constants as c
 import WriteGLFile as w
-import CuViewer
+import cuviewer
 import random
 
 
