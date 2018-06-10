@@ -2,11 +2,11 @@ from PyQt4 import QtCore, QtGui
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 #from PyQt4.QtCore import QThread
 #from PyQt4.QtCore import QObject, pyqtSignal, pyqtSlot
-import display
+import Display
 import vtk
 
 
-class MainWindow(QtGui.QMainWindow, display.Ui_MainWindow):
+class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
 
     def __init__(self, scenes):
         ##
