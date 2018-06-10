@@ -2,7 +2,7 @@
 
 import Constants as c
 import WriteGLFile as w
-import cuviewer
+import CuViewer
 import random
 
 
