@@ -54,6 +54,10 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         self.renderer.ResetCamera()
         self.SetView('v')
 
+        # Actions for menu bar
+        self.actionExit.triggered.connect(lambda: self.Exit())
+        #self.actionExit.triggered.connect(lambda: self.closeEvent())
+
 
     def CreateSceneMappersAndActors(self):
         for s in self.scenes:
@@ -247,6 +251,11 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
+
+    # All the handlers for MainWindow described here
+
+    def Exit(self):
+        self.close()
 
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
 
