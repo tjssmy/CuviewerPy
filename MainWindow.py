@@ -1,14 +1,18 @@
 from PyQt4 import QtCore, QtGui
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PyQt4.QtCore import *
+import sys
+from PyQt4.QtGui import *
 #from PyQt4.QtCore import QThread
 #from PyQt4.QtCore import QObject, pyqtSignal, pyqtSlot
 import Display
 import vtk
+import CuViewer
 
 
 class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
 
-    def __init__(self, scenes):
+    def __init__(self):
         ##
         self.version = ''
         self.err = 0
@@ -24,9 +28,9 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         super(self.__class__, self).__init__()
         self.setupUi(self)
 
-        self.scenes = scenes
+        self.vtkCuv = CuViewer.CreateVtkCuv()
 
-        self.CreateSceneMappersAndActors()
+        #self.CreateSceneMappersAndActors()
 
         self.vl = QtGui.QVBoxLayout()
         self.vtkWidget = QVTKRenderWindowInteractor(self.frame)
@@ -37,12 +41,12 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         self.renderWindowInteractor = vtk.vtkRenderWindowInteractor()
         self.renderer.SetBackground(.9, .9, .9)
 
-        self.AddActors()
+        #self.AddActors()
 
         style = StructureInteractorStyle(self)
         self.renderWindowInteractor.SetInteractorStyle(style)
 
-        self.PrintSceneInfo()
+        #self.PrintSceneInfo()
 
 
         self.vtkWidget.GetRenderWindow().AddRenderer(self.renderer)
@@ -52,19 +56,20 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
 
         self.camera = self.renderer.GetActiveCamera()
         self.renderer.ResetCamera()
-        self.SetView('v')
+        #self.SetView('v')
 
         # Actions for menu bar
         self.actionExit.triggered.connect(lambda: self.Exit())
+        self.actionOpen.triggered.connect(lambda: self.Open())
         #self.actionExit.triggered.connect(lambda: self.closeEvent())
 
 
     def CreateSceneMappersAndActors(self):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
             s.CreateVtkMapperActor()
 
     def AddActors(self):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
             self.renderer.AddActor(s.surfActor)
             self.renderer.AddActor(s.edgeActor)
             self.renderer.AddActor(s.contActor)
@@ -75,7 +80,7 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
                 self.renderer.AddActor(s.spheroidActor[i])
 
     def RemoveActors(self):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
             self.renderer.RemoveActor(s.surfActor)
             self.renderer.RemoveActor(s.edgeActor)
             self.renderer.RemoveActor(s.contActor)
@@ -123,7 +128,7 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         self.ReDraw()
 
     def ReDraw(self):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
 
             if not s.visible:
                 s.surfActor.VisibilityOff()
@@ -171,17 +176,21 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
 
     def ReReadFile(self):
         self.RemoveActors()
-        self.ReadCuvFile()
+        self.vtkCuv.ReadCuvFile()
         self.CreateSceneMappersAndActors()
         self.AddActors()
+        self.camera = self.renderer.GetActiveCamera()
+        self.renderer.ResetCamera()
+        self.SetView('v')
         self.ReDraw()
+        self.ShowHelp()
 
     def ResetArrowGlyphScale(self,sc):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
             s.ResetArrowGlyphScale(sc)
 
     def SceneVis(self,vis):
-        for s in self.scenes:
+        for s in self.vtkCuv.scenes:
             s.visible = vis
 
     def TogglePersp(self):
@@ -228,6 +237,30 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
                 s.vtkVectPolyData.GetNumberOfVerts()))
 
     def ShowHelp(self):
+        self.textBrowser.append('\nKey board commands:')
+        self.textBrowser.append('\tt: Toggle screen visibility.')
+        self.textBrowser.append('\t\t1) Command sequence single scene: t <scene number> t')
+        self.textBrowser.append('\t\t2) Command sequence scene range: t <scene number> - <scene number t')
+        self.textBrowser.append('\ta: Draw all scenes')
+        self.textBrowser.append('\tn: Don\'t draw any scenes')
+        self.textBrowser.append('\tp: toggle perspective view')
+        self.textBrowser.append('\trlfbfud: Standard views')
+        self.textBrowser.append('\t\tr: right side')
+        self.textBrowser.append('\t\tl: left side')
+        self.textBrowser.append('\t\tf: front side')
+        self.textBrowser.append('\t\tb: back side')
+        self.textBrowser.append('\t\tu: bottom side')
+        self.textBrowser.append('\t\td: top side')
+        self.textBrowser.append('\to: Outline polys')
+        self.textBrowser.append('\tc: Create contours')
+        self.textBrowser.append('\ti: Print scene info.')
+        self.textBrowser.append('\tR: Reread and render file')
+        self.textBrowser.append('\tL: Toggle lighting on/off')
+        self.textBrowser.append('\tV: Toggle vectors on/off')
+        self.textBrowser.append('\t+: Increase vectors size')
+        self.textBrowser.append('\t-: Increase vectors size')
+        self.textBrowser.append('\th: This message')
+        '''
         print('\nKey board commands:')
         print('\tt: Toggle screen visibility.')
         print('\t\t1) Command sequence single scene: t <scene number> t')
@@ -251,11 +284,34 @@ class MainWindow(QtGui.QMainWindow, Display.Ui_MainWindow):
         print('\t+: Increase vectors size')
         print('\t-: Increase vectors size')
         print('\th: This message')
+        '''
 
     # All the handlers for MainWindow described here
 
     def Exit(self):
         self.close()
+
+
+    def Open(self):
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.ExistingFile)
+        dlg.setFilter("GL files (*.gl)")
+        self.vtkCuv.file = dlg.getOpenFileName()
+        self.ReReadFile()
+
+        '''
+        dlg = QFileDialog()
+        dlg.setFileMode(QFileDialog.ExistingFile)
+        dlg.setFilter("GL files (*.gl)")
+        filename = ""
+
+        if dlg.exec_():
+            filenames = dlg.selectedFiles()
+            self.vtkCuv.file = dlg.getOpenFileName()
+            self.ReReadFile()
+            #self.vtkCuv.ReadCuvFile(filenames)
+        '''
+
 
 class StructureInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
 

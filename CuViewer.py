@@ -622,12 +622,15 @@ class CreateVtkCuv(object):
         self.ContDraw = False
         self.VectDraw = True
         self.Lighting = True
+        self.file = ""
 
-    def ReadCuvFile(self, file=None):
+    #def ReadCuvFile(self, file=None):
+    def ReadCuvFile(self):
         print('Reading file ... ')
 
-        if file is not None:
-            self.file = file
+        if self.file is  None:
+            print('No file specified ...')
+            return
 
         self.fdata = CuvFileData(self.file)
         self.fid = 0
@@ -705,3 +708,7 @@ class CreateVtkCuv(object):
 
     def SetRenderWin(self):
         self.window = MainWindow.MainWindow(self.scenes)
+
+    def CreateSceneMappersAndActors(self):
+        for s in self.scenes:
+            s.CreateVtkMapperActor()
